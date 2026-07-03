@@ -37,6 +37,7 @@ class Ctx{
             }
         }
         mouse.clicked = true;
+        this.handle_click(mouse);
     }
     update_out(output: number){
         if(this.entered_code == ""){
@@ -55,7 +56,20 @@ class Ctx{
             }
         }
     }
+
+    checkWinCondition(): boolean{
+        return this.entered_code == this.stored_code;
+    }
    
 }
 
-export {Ctx};
+class codebox{
+    x: number;
+    y: number;
+
+    height: number;
+    width: number;
+    inner_code: string;    
+}
+
+export {Ctx, codebox};
