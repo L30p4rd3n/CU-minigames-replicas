@@ -2,9 +2,17 @@ import {inRange, randrange} from "./util/util";
 import {Mouse} from "./mouse"
 import {Button} from "./buttons";
 
+/* class affectedBodyParams {
+    /// Body parameters possible affected by (or affecting) the minigame
+    pain: number;
+    bleedAmount: number;
+    skinHealth: number;
+    muscleHealth: number;
+} */
+
 class Ctx{
     stored_code: string; // no number manipulations :(
-    entered_code: string;
+    entered_code: string = "";
     buttons: Button[];
 
     clear_ctx(){
@@ -41,9 +49,9 @@ class Ctx{
     }
     AddDashes(output: number){
         if(this.entered_code == ""){
-            this.entered_code += output;
+            this.entered_code = output.toString();
         }else{
-            this.entered_code += (output * -1);
+            this.entered_code += (output * -1).toString();
         }
     }
 
@@ -56,6 +64,9 @@ class Ctx{
             }else{
                 this.AddDashes(mouse.captured_output);
                 this.checkMegalovania();
+                if(this.checkWinCondition()){
+                    // this.endMinigame(fail=false);
+                }
             }
         }
     }
@@ -65,13 +76,12 @@ class Ctx{
     }
 
     checkMegalovania(){
-        if(this.entered_code.includes("2296") && !(this.stored_code.includes("2296"))){
-            console.log("lmfao explode");
-            // this.endMinigame
+        if((this.entered_code.includes("2296")) && !(this.stored_code.includes("2296"))){
+            // this.endMinigame(fail=true);
         }return;
     }
 
-    /* endMinigame(){
+    /* endMinigame(fail: bool){
         this.buttons = {...} // only re-generate button spanning the entire screen
         // changes to right part of the screen, where the stats are shown.
     }   

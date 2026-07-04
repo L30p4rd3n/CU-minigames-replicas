@@ -69,5 +69,11 @@ const draw_base = () => {
     ctx.font = '42px Retro Gaming';
     ctx.fillText(keypad.stored_code, 100 * SCALE, 100 * SCALE);
 
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = '42px Retro Gaming';
+    ctx.fillText(keypad.entered_code, 100 * SCALE, 150 * SCALE);
+
     requestAnimationFrame(draw_base);
 }
+
+draw_base();
