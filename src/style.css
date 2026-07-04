@@ -10,7 +10,7 @@ body{
 .panel-right{
     display: flex;
     flex-direction: column;
-    padding-left: 20px;
+    padding: 20px;
     align-items: center
 }
 canvas{

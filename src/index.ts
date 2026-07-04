@@ -140,8 +140,6 @@ canvas.addEventListener("mouseup", () => {
 })
 
 const draw_base = () => {
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(keypadImage, 0, 0);
 
     ctx.fillStyle = "#FFF";
@@ -156,3 +154,8 @@ const draw_base = () => {
 }
 
 draw_base();
+
+document.getElementById("coderegen")!.addEventListener("click", () => {
+    mouse.captured_output = -1;
+    keypad.handle_click(mouse);
+});
