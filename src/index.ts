@@ -4,7 +4,7 @@ import type { Mouse } from "./mouse";
 import "./style.css"
 
 const canvas = document.getElementById("main-canvas")! as HTMLCanvasElement;
-//const SCALE = 1;
+const SCALE = 1;
 
 // const updateRate = 60;
 // const DeltaTime = 1/updateRate;
@@ -124,9 +124,18 @@ const keypadImage = await loadImage("../assets/image/keypad.png");
 canvas.width = keypadImage.width;
 canvas.height = keypadImage.height;
 
+function getMousePos(e: MouseEvent){
+    let rect = canvas.getBoundingClientRect();
+    return {
+        x: (e.clientX - rect.left) * (canvas.width / rect.width),
+        y: (e.clientY - rect.top) * (canvas.height / rect.height)
+    }
+}
+
 canvas.addEventListener("mousemove", (e: MouseEvent) =>{
-    mouse.x = e.clientX - canvas.getBoundingClientRect().left;
-    mouse.y = e.clientY - canvas.getBoundingClientRect().top;
+    let pos = getMousePos(e);
+    mouse.x = pos.x;
+    mouse.y = pos.y;
 });
 
 canvas.addEventListener("mousedown", () => {
@@ -145,11 +154,11 @@ const draw_base = () => {
     ctx.fillStyle = "#FFF";
     ctx.font = '42px Retro Gaming';
     ctx.textAlign = 'center';
-    ctx.fillText(keypad.codeboxes[0].stored_code, canvas.width / 2, codeboxes[0].y + codeboxes[0].height / 2 + 12);
+    ctx.fillText(keypad.codeboxes[0].stored_code, canvas.width / 2 * SCALE, (codeboxes[0].y + codeboxes[0].height / 2 + 16 * SCALE));
 
     ctx.fillStyle = "#FFF";
     ctx.font = '42px Retro Gaming';
-    ctx.fillText(keypad.codeboxes[1].stored_code, canvas.width / 2, codeboxes[1].y + codeboxes[1].height / 2 + 24);
+    ctx.fillText(keypad.codeboxes[1].stored_code, canvas.width / 2 * SCALE, (codeboxes[1].y + codeboxes[1].height / 2 + 16) * SCALE);
     requestAnimationFrame(draw_base);
 }
 
