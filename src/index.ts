@@ -17,11 +17,6 @@ const loadImage = (path: string): Promise<HTMLImageElement> => {
     return new Promise(r => {image.onload = () => r(image)});
 };
 
-const ctx = canvas.getContext("2d")!;
-const mouse: Mouse = {x: 0, y: 0, captured_output: 0, clicked: false};
-const keypad = new Ctx();
-keypad.generate_code();
-
 const buttonbuttons = [
     {
         x: 0,
@@ -39,7 +34,30 @@ const buttonbuttons = [
     }
 ]
 
+const codeboxes = [
+    {
+        x: 0,
+        y: 0,
+        width: 200,
+        height: 200,
+        stored_code: ""
+    },
+    {
+        x: 0,
+        y: 200,
+        width: 200,
+        height: 200,
+        stored_code: ""
+    }
+]
+
+const ctx = canvas.getContext("2d")!;
+const mouse: Mouse = {x: 0, y: 0, captured_output: 0, clicked: false};
+const keypad = new Ctx();
 keypad.buttons = buttonbuttons;
+keypad.codeboxes = codeboxes;
+keypad.generate_code();
+
 const keypadImage = await loadImage("../assets/keypad.png");
 canvas.width = keypadImage.width;
 canvas.height = keypadImage.height;
@@ -67,11 +85,11 @@ const draw_base = () => {
 
     ctx.fillStyle = "#FFFFFF";
     ctx.font = '42px Retro Gaming';
-    ctx.fillText(keypad.stored_code, 100 * SCALE, 100 * SCALE);
+    ctx.fillText(keypad.codeboxes[0].stored_code, 100 * SCALE, 100 * SCALE);
 
     ctx.fillStyle = "#FFFFFF";
     ctx.font = '42px Retro Gaming';
-    ctx.fillText(keypad.entered_code, 100 * SCALE, 150 * SCALE);
+    ctx.fillText(keypad.codeboxes[1].stored_code, 100 * SCALE, 150 * SCALE);
 
     requestAnimationFrame(draw_base);
 }

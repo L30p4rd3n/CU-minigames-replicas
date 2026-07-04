@@ -6,4 +6,12 @@ interface Button{
     output: number;
 }
 
-export type {Button}
+interface Codebox{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    stored_code: string;
+}
+
+export type {Button, Codebox}
