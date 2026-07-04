@@ -1,8 +1,8 @@
-import {Ctx, codebox} from "./context";
+import {Ctx} from "./context";
 import {Button} from "./buttons";
 import {Mouse} from "./mouse";
 
-const canvas = document.getElementById("canvas-main")! as HTMLCanvasElement;
+const canvas = document.getElementById("main-canvas")! as HTMLCanvasElement;
 const HEIGHT = 400;
 const WIDTH = 400;
 const SCALE = 2;
@@ -19,24 +19,30 @@ const loadImage = (path: string): Promise<HTMLImageElement> => {
     image.src = path;
     return new Promise(r => {image.onload = () => r(image)});
 };
-const keypadImage = await loadImage("../assets/keypad.png");
 
 const ctx = canvas.getContext("2d")!;
 const mouse: Mouse = {x: 0, y: 0, captured_output: 0, clicked: false};
 const keypad = new Ctx();
 
-const mouseMove = (e: MouseEvent, mouse: Mouse) => {
-    mouse.x = e.clientX;
-    mouse.y = e.clientY;
-}
+const buttonbuttons = [
+    {
+        x: 0,
+        y: 0,
+        width: 100,
+        height: 100,
+        output: 1
+    },
+    {
+        x: 150,
+        y: 0,
+        width: 100, 
+        height: 100,
+        output: 2
+    }
+]
 
-function mouseDown(e: MouseEvent, mouse: Mouse): void{
-    mouse.clicked = true;
-}
-
-function mouseUp(e: MouseEvent, mouse: Mouse): void{
-    mouse.clicked = false;
-}
+keypad.buttons = buttonbuttons;
+const keypadImage = await loadImage("../assets/keypad.png");
 
 canvas.addEventListener("mousemove", (e: MouseEvent) =>{
     mouse.x = e.clientX;
@@ -47,6 +53,7 @@ canvas.addEventListener("mousemove", (e: MouseEvent) =>{
 canvas.addEventListener("mousedown", () => {
     keypad.check_click(mouse);
     console.log("mouse down");
+    console.log(keypad.entered_code);
 });
 
 canvas.addEventListener("mouseup", () => {
@@ -58,4 +65,9 @@ canvas.addEventListener("mouseup", () => {
 const draw_base = () => {
     ctx.drawImage(keypadImage, 0, 0);
 
+    ctx.fillStyle = "#FFFFFF";
+    ctx.font = '42px Retro Gaming';
+    ctx.fillText(keypad.stored_code, 100 * SCALE, 100 * SCALE);
+
+    requestAnimationFrame(draw_base);
 }

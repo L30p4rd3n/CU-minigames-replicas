@@ -39,20 +39,23 @@ class Ctx{
         mouse.clicked = true;
         this.handle_click(mouse);
     }
-    update_out(output: number){
+    AddDashes(output: number){
         if(this.entered_code == ""){
             this.entered_code += output;
         }else{
-            this.entered_code += (output * -1); // -{number}
+            this.entered_code += (output * -1);
         }
     }
 
     handle_click(mouse: Mouse){
+        /// handVelocity should be changed here.
         if(mouse.captured_output != -3){
             if(!(inRange(mouse.captured_output, 0, 9))){
+                /// this will work for both the in-game reset button and the added-in re-generate button
                 this.reset(mouse.captured_output == -1);
             }else{
-                this.update_out(mouse.captured_output);
+                this.AddDashes(mouse.captured_output);
+                this.checkMegalovania();
             }
         }
     }
@@ -60,16 +63,20 @@ class Ctx{
     checkWinCondition(): boolean{
         return this.entered_code == this.stored_code;
     }
+
+    checkMegalovania(){
+        if(this.entered_code.includes("2296") && !(this.stored_code.includes("2296"))){
+            console.log("lmfao explode");
+            // this.endMinigame
+        }return;
+    }
+
+    /* endMinigame(){
+        this.buttons = {...} // only re-generate button spanning the entire screen
+        // changes to right part of the screen, where the stats are shown.
+    }   
+    */
    
 }
 
-class codebox{
-    x: number;
-    y: number;
-
-    height: number;
-    width: number;
-    inner_code: string;    
-}
-
-export {Ctx, codebox};
+export {Ctx};
