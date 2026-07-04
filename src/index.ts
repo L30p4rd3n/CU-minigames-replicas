@@ -140,7 +140,6 @@ canvas.addEventListener("mousemove", (e: MouseEvent) =>{
 
 canvas.addEventListener("mousedown", () => {
     keypad.check_click(mouse);
-    console.log(keypad.entered_code);
 });
 
 canvas.addEventListener("mouseup", () => {
@@ -157,7 +156,7 @@ const draw_base = () => {
     ctx.fillText(keypad.codeboxes[0].stored_code, canvas.width / 2 * SCALE, (codeboxes[0].y + codeboxes[0].height / 2 + 16 * SCALE));
 
     ctx.fillStyle = "#FFF";
-    ctx.font = '42px Retro Gaming';
+    ctx.font = '64px Retro Gaming';
     ctx.fillText(keypad.codeboxes[1].stored_code, canvas.width / 2 * SCALE, (codeboxes[1].y + codeboxes[1].height / 2 + 16) * SCALE);
     requestAnimationFrame(draw_base);
 }

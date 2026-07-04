@@ -6,9 +6,11 @@
     <body>
         <div id="app">
             <div class="panel-left"><canvas id="main-canvas"></canvas></div>
-            <div class="panel-right" id="result-panel">
-                <!--some config panel things(re-generate code, enter custom code)-->
+            <div class="panel" id="result-panel">
                 <button id="coderegen">Generate new code</button>
+                <div id=results>
+                    <div id="logs"></div>
+                </div>  
             </div>  
         </div>
         <script type="module" src="/src/index.ts"></script>
