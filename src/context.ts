@@ -16,7 +16,7 @@ const dashFill = (numstr: string): string => {
         return "";
     }outstr = numstr[0];
     for(let i = 1; i < numstr.length; i++){
-        outstr += -1 * (Number(numstr[i]));
+        outstr += Number(numstr[i]) ? -1 * (Number(numstr[i])) : "-0";
     }return outstr;
 }
 
@@ -28,6 +28,7 @@ class Ctx{
 
     clear_ctx(){
         this.entered_code = "";
+        this.codeboxes[1].stored_code = "";
     }
 
     reset(isRegenNeeded: boolean){
@@ -36,7 +37,7 @@ class Ctx{
         }this.clear_ctx();
     }
 
-    generate_code(){ // onclick + condition
+    generate_code(){
         let num = randrange(6, 13);
         let code = "";
         for(let i = 0; i < num; ++i){
@@ -46,10 +47,10 @@ class Ctx{
         this.codeboxes[0].stored_code = dashFill(this.stored_code);
     }
 
-    check_click(mouse: Mouse){ // onclick event
+    check_click(mouse: Mouse){
         if(mouse.clicked){
             return; 
-        }mouse.captured_output = -3; // NULL
+        }mouse.captured_output = -3;
         for(let i = 0; i < this.buttons.length; i++){
             if(inRange(mouse.x, this.buttons[i].x, this.buttons[i].x + this.buttons[i].width) 
             && inRange(mouse.y, this.buttons[i].y, this.buttons[i].y + this.buttons[i].height)){
@@ -69,10 +70,10 @@ class Ctx{
                 this.reset(mouse.captured_output == -1); /// this will work for both the in-game reset button and the added-in re-generate button
             }else{
                 this.entered_code += mouse.captured_output;
-                this.codeboxes[1].stored_code = dashFill(this.stored_code);
+                this.codeboxes[1].stored_code = dashFill(this.entered_code);
                 this.checkMegalovania();
                 if(this.checkWinCondition()){
-                    // this.endMinigame(fail=false);
+                    this.endMinigame(false);
                 }
             }
         }
@@ -84,16 +85,18 @@ class Ctx{
 
     checkMegalovania(){
         if((this.entered_code.includes("2296")) && !(this.stored_code.includes("2296"))){
-            // this.endMinigame(fail=true);
+            this.endMinigame(true);
         }return;
     }
 
-    /* endMinigame(fail: bool){
-        this.buttons = {...} // only re-generate button spanning the entire screen
-        // changes to right part of the screen, where the stats are shown.
+    endMinigame(fail: boolean): void{
+        //this.buttons = {...} // only re-generate button spanning the entire screen
+        if(fail){
+            // something about explode
+        }else{
+            // something about success
+        }
     }   
-    */
-   
 }
 
 export {Ctx};
