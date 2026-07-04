@@ -5,4 +5,4 @@ interface Mouse{
     clicked: boolean;
 }
 
-export {Mouse}
+export type {Mouse}

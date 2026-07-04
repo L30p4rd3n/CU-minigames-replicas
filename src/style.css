@@ -1,0 +1,22 @@
+body{
+    background-color: black;
+    color: white;
+}
+.panel-left{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.panel-right{
+    display: flex;
+    flex-direction: column;
+    padding-left: 20px;
+    align-items: center
+}
+canvas{
+    -webkit-user-drag: none;
+}@font-face {
+	font-family: "Retro Gaming";
+	src: url("./assets/font/RetroGaming.ttf");
+	text-rendering: optimizeSpeed;
+}

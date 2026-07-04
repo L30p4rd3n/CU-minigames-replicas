@@ -1,18 +1,15 @@
 import {Ctx} from "./context";
-import {Button} from "./buttons";
-import {Mouse} from "./mouse";
+// import type { Button } from "./buttons";
+import type { Mouse } from "./mouse";
+
+import "./style.css"
 
 const canvas = document.getElementById("main-canvas")! as HTMLCanvasElement;
-const HEIGHT = 400;
-const WIDTH = 400;
 const SCALE = 2;
 
-const updateRate = 60;
-const DeltaTime = 1/60; // s
+// const updateRate = 60;
+// const DeltaTime = 1/updateRate;
 
-
-canvas.width = WIDTH*SCALE;
-canvas.height = HEIGHT*SCALE;
 
 const loadImage = (path: string): Promise<HTMLImageElement> => {
     const image = new Image();
@@ -23,6 +20,7 @@ const loadImage = (path: string): Promise<HTMLImageElement> => {
 const ctx = canvas.getContext("2d")!;
 const mouse: Mouse = {x: 0, y: 0, captured_output: 0, clicked: false};
 const keypad = new Ctx();
+keypad.generate_code();
 
 const buttonbuttons = [
     {
@@ -43,6 +41,8 @@ const buttonbuttons = [
 
 keypad.buttons = buttonbuttons;
 const keypadImage = await loadImage("../assets/keypad.png");
+canvas.width = keypadImage.width;
+canvas.height = keypadImage.height;
 
 canvas.addEventListener("mousemove", (e: MouseEvent) =>{
     mouse.x = e.clientX;

@@ -6,4 +6,4 @@ interface Button{
     output: number;
 }
 
-export {Button}
+export type {Button}

@@ -1,6 +1,6 @@
 import {inRange, randrange} from "./util/util";
-import {Mouse} from "./mouse"
-import {Button} from "./buttons";
+import type {Mouse} from "./mouse"
+import type {Button} from "./buttons";
 
 /* class affectedBodyParams {
     /// Body parameters possible affected by (or affecting) the minigame
