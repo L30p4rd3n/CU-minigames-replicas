@@ -168,6 +168,9 @@ const draw_base = () => {
             wrap_flag = true;
             piece2 += codeboxes[1].stored_code[i];
         }
+    }if(piece2.startsWith("-")){
+        piece1 = codeboxes[1].stored_code.slice(0, piece1.lastIndexOf('-') + 1);
+        piece2 = codeboxes[1].stored_code.slice(piece1.lastIndexOf('-') + 1);
     }
     if(wrap_flag){
         ctx.fillText(piece1, canvas.width / 2 * SCALE, (codeboxes[1].y + codeboxes[1].height / 2 - 8) * SCALE);
