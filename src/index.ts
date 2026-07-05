@@ -156,8 +156,26 @@ const draw_base = () => {
     ctx.fillText(keypad.codeboxes[0].stored_code, canvas.width / 2 * SCALE, (codeboxes[0].y + codeboxes[0].height / 2 + 16 * SCALE));
 
     ctx.fillStyle = "#FFF";
-    ctx.font = '64px Retro Gaming';
-    ctx.fillText(keypad.codeboxes[1].stored_code, canvas.width / 2 * SCALE, (codeboxes[1].y + codeboxes[1].height / 2 + 16) * SCALE);
+    ctx.font = '70px Retro Gaming';
+    //console.log(ctx.measureText(codeboxes[1].stored_code).width)
+    let wrap_flag: boolean = false;
+    let piece1: string = "";
+    let piece2: string = "";
+    for(let i = 0; i < codeboxes[1].stored_code.length; i++){
+        if(ctx.measureText(codeboxes[1].stored_code.slice(0, i+1)).width < 700 * SCALE){
+            piece1 += codeboxes[1].stored_code[i];
+        }else{
+            wrap_flag = true;
+            piece2 += codeboxes[1].stored_code[i];
+        }
+    }
+    if(wrap_flag){
+        ctx.fillText(piece1, canvas.width / 2 * SCALE, (codeboxes[1].y + codeboxes[1].height / 2 - 8) * SCALE);
+        ctx.fillText(piece2, canvas.width / 2 * SCALE, (codeboxes[1].y + codeboxes[1].height / 2 + 58) * SCALE);
+    }else{
+        ctx.fillText(piece1, canvas.width / 2 * SCALE, (codeboxes[1].y + codeboxes[1].height / 2 + 20) * SCALE);
+    }
+    
     requestAnimationFrame(draw_base);
 }
 
