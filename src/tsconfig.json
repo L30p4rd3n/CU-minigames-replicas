@@ -1,8 +1,0 @@
-{
-    "compilerOptions": {
-        "strictPropertyInitialization": false,
-        "allowImportingTsExtensions": true,
-        "moduleDetection": "force",
-        "noEmit": true
-    }
-}
