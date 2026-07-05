@@ -120,7 +120,7 @@ keypad.buttons = buttonbuttons;
 keypad.codeboxes = codeboxes;
 keypad.generate_code();
 
-const keypadImage = await loadImage("../assets/image/keypad.png");
+const keypadImage = await loadImage("assets/image/keypad.png");
 canvas.width = keypadImage.width;
 canvas.height = keypadImage.height;
 

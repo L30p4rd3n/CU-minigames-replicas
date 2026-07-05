@@ -28,7 +28,7 @@ body{
     height: auto;
 }@font-face {
 	font-family: "Retro Gaming";
-	src: url("./assets/font/RetroGaming.ttf");
+	src: url("/assets/font/RetroGaming.ttf");
 	text-rendering: optimizeSpeed;
 }
 #main-canvas {
