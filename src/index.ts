@@ -157,7 +157,6 @@ const draw_base = () => {
 
     ctx.fillStyle = "#FFF";
     ctx.font = '70px Retro Gaming';
-    //console.log(ctx.measureText(codeboxes[1].stored_code).width)
     let wrap_flag: boolean = false;
     let piece1: string = "";
     let piece2: string = "";
