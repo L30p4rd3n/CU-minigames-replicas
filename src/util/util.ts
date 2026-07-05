@@ -15,4 +15,10 @@ function VectorToAngle(dir: Vector2){
     }return num;
 }
 
-export {inRange, randrange, VectorToAngle};
+function moveTowards(current: number, target: number, maxDelta: number){
+    if (Math.abs(target - current) <= maxDelta){
+        return target;
+    }return current + Math.sign(target - current) * maxDelta;
+}
+
+export {inRange, randrange, VectorToAngle, moveTowards};

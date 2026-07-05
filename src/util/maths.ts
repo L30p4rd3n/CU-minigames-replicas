@@ -1,10 +1,7 @@
+/* Vector math */
 interface Vector2{
     x: number;
     y: number;
-    add(other: Vector2): Vector2;
-    // multiply(other: Vector2): Vector2; // scalar, not vector; can be used to find cos;
-    multuply(lambda: number): Vector2;
-    // {x, y}
 }
 
 const coordsToVector = (x1: number, x2: number, y1: number, y2: number) => {
@@ -19,5 +16,23 @@ const normalised = (v: Vector2) => { // yes, i was taught bri'ish english
 
 export type {Vector2};
 export {coordsToVector, magnitude, normalised};
+/* Math math */
+function Clamp01(num: number){
+    if(num < 0){
+        num = 0;
+    }if(num > 1){
+        num = 1;
+    }return num;
+}
+function Clamp(num: number, lb : number, hb: number){
+    if(num < lb){
+        num = lb;
+    }if(num > hb){
+        num = hb;
+    }return num;
+}
+function Lerp(a: number, b: number, t: number){ 
+    return a + (b-a) * t;
+}
 
-
+export {Clamp, Clamp01, Lerp}
