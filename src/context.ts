@@ -11,7 +11,7 @@ import type {Button, Codebox} from "./buttons";
 } */
 
 const logs = document.getElementById("logs")!;
-logs.style = 'font-family: "Retro Gaming";src: url("./assets/font/RetroGaming.ttf");text-rendering: optimizeSpeed; color: white';
+logs.style = 'font-family: "Retro Gaming";src: url("assets/font/RetroGaming.ttf");text-rendering: optimizeSpeed; color: white';
 
 const dashFill = (numstr: string): string => {
     let outstr = "";
@@ -71,11 +71,11 @@ class Ctx{
 
         if(mouse.captured_output != -3){
             if(!(inRange(mouse.captured_output, 0, 9))){
-                const sound = new Audio(`../assets/sound/beep0.ogg`)
+                const sound = new Audio(`assets/sound/beep0.ogg`)
                 sound.play();
                 this.reset(mouse.captured_output == -1); /// this will work for both the in-game reset button and the added-in re-generate button
             }else{
-                const sound = new Audio(`../assets/sound/beep${mouse.captured_output}.ogg`)
+                const sound = new Audio(`assets/sound/beep${mouse.captured_output}.ogg`)
                 sound.play();
                 if(this.entered_code.length >= this.stored_code.length){
                     return;
