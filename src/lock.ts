@@ -1,10 +1,15 @@
 import type { ActiveComponent } from "./buttons";
 import type { Mouse } from "./mouse";
-import { Clamp, coordsToVector, Clamp01, Lerp, magnitude } from "./util/maths";
+import { Clamp, coordsToVector, Clamp01, magnitude, relativeX, relativeY } from "./util/maths";
 import { inRange, moveTowards, randrange, VectorToAngle } from "./util/util";
 
-const handAngle = (mouse: Mouse) => { // NOT a correct repr.
-    return VectorToAngle(coordsToVector(0, mouse.x, 0, mouse.y));
+const findCenter = (c: ActiveComponent) => {
+    return {x: c.x + c.width / 2, y: c.y + c.height / 2}
+}
+
+const handAngle = (mouse: Mouse, lockRect: ActiveComponent) => {
+    return VectorToAngle(coordsToVector(findCenter(lockRect).x, relativeX(mouse.x, findCenter(lockRect).x), 
+    findCenter(lockRect).y, relativeY(mouse.y, findCenter(lockRect).y)));
 }
 
 class Lock{
@@ -22,17 +27,17 @@ class Lock{
     initState(lockRect: ActiveComponent){ // ъуъ
         this.lockRect = lockRect;
         this.correctAngle = randrange(5, 175);
-        // sounds(2)
+        // sounds[2]
         this.innerText = `something something degrees, i can't remember and i didn't have the game open at that moment`;
-        // bool check for INT and lockpick
+        // bool check for INT and lockpick sprites
         this.pickLevel = -1;
     }
     clicking_inside(mouse: Mouse){
-        return handAngle(mouse) > 0 && handAngle(mouse) < 180 && inRange(magnitude({x: mouse.x, y: mouse.y}), 195, 247); // might be relative...
+        return handAngle(mouse, this.lockRect) > 0 && handAngle(mouse, this.lockRect) < 180 && inRange(magnitude({x: mouse.x, y: mouse.y}), 195, 247); // might be relative...
     }
 
     MaxTurnProgress(mouse: Mouse){
-        let num: number = Math.abs(VectorToAngle(coordsToVector(0, mouse.x, 0, mouse.y))); // x1, y1 = {component.x, component.y}, anchor etc...
+        let num: number = Math.abs(handAngle(mouse, this.lockRect) - this.correctAngle);
         if(num < this.anglePrecision){
             num = 0;
         }return Clamp01(1 - num / 90);

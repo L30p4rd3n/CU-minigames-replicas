@@ -14,8 +14,8 @@ const normalised = (v: Vector2) => { // yes, i was taught bri'ish english
     return {x: v.x / magnitude(v), y: v.y / magnitude(v)}; // me realy mathing it rn
 }
 
-export type {Vector2};
-export {coordsToVector, magnitude, normalised};
+export type {Vector2}
+export {coordsToVector, magnitude, normalised}
 /* Math math */
 function Clamp01(num: number){
     if(num < 0){
@@ -36,3 +36,17 @@ function Lerp(a: number, b: number, t: number){
 }
 
 export {Clamp, Clamp01, Lerp}
+
+/* Coordinate math */
+// NOTE: works only if initial (0,0) is in 2nd quarter of new (0,0) = (x0, y0)
+// NOTE: the same {i,j} is used, without rotations
+const relativeX = (absX: number, anchorX: number) => {
+    return (anchorX - absX);
+}
+const relativeY = (absY: number, anchorY: number) => {
+    return (absY - anchorY);
+}
+
+
+export {relativeX, relativeY}
+
