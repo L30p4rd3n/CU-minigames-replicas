@@ -130,9 +130,9 @@ const logStats = () => {
         <p>correctAngle: ${minigame.correctAngle}</p>
         <p>currentAngle: ${handAngle(minigame.justClickedX, minigame.justClickedY).toFixed(2)}</p>
         <p>lockProgress: ${minigame.lockProgress.toFixed(2)}</p>
-        <p>Pain: ${minigame.trackPain}</p>
-        <p>Claw Health: ${minigame.trackClawHealth}</p>
-        <p>Lockpicking kit durability:${(useLockpick && int > 10) ? minigame.trackLockpick.toFixed(2) : "you're too dumb to use it :D"}</p>
+        <p>${(useLockpick && int >= 10) ? "" : "Pain: " + minigame.trackPain}</p>
+        <p>${(useLockpick && int >= 10) ? "" : "Claw Health: " + minigame.trackClawHealth}</p>
+        <p>${(useLockpick && int >= 10) ? "Lock picking kit durability: " + minigame.trackLockpick.toFixed(2) : ""}</p>
         `;
     }else{
         logs.innerHTML = ``;
@@ -161,15 +161,19 @@ document.getElementById("removeint")!.addEventListener("click", () => {
 });
 document.getElementById("uselockpick")!.addEventListener("click", () => {
     useLockpick = !useLockpick;
+    minigame.initState(lockRect, useLockpick, int, containerType);
 });
 document.getElementById("type1")!.addEventListener("click", () => {
     containerType = 0;
+    minigame.initState(lockRect, useLockpick, int, containerType);
 });
 document.getElementById("type2")!.addEventListener("click", () => {
     containerType = 1;
+    minigame.initState(lockRect, useLockpick, int, containerType);
 });
 document.getElementById("type3")!.addEventListener("click", () => {
     containerType = 2;
+    minigame.initState(lockRect, useLockpick, int, containerType);
 });
 document.getElementById("toggle-hidden")!.addEventListener("click", () => {
     hidden = !hidden;
