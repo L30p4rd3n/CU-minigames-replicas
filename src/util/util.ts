@@ -22,4 +22,14 @@ function moveTowards(current: number, target: number, maxDelta: number){
     }return current + Math.sign(target - current) * maxDelta;
 }
 
-export {inRange, randrange, VectorToAngle, moveTowards};
+const quickfire = (path: string): void => {
+    const sound = new Audio(path)
+    sound.play();
+}
+const loadImage = (path: string): Promise<HTMLImageElement> => {
+    const image = new Image();
+    image.src = path;
+    return new Promise(r => {image.onload = () => r(image)});
+};
+
+export {inRange, randrange, VectorToAngle, moveTowards, quickfire, loadImage};

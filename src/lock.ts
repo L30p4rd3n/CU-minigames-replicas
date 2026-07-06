@@ -9,6 +9,8 @@ const handAngle = (dx: number, dy: number) => {
 }
 
 const containers = [1, 2.5, 8]; // container, medical, lifepod
+const unlockSound = new Audio("assets/sound/unlock.ogg");
+const pickLoop = new Audio("assets/sound/lockpickLoop.ogg");
 
 class Lock{
     pickLevel: number;
@@ -29,14 +31,20 @@ class Lock{
     trackClawHealth: number;
     trackLockpick: number;
 
+    beaten: boolean;
+
+    lockJitterX: number = 0;
+    lockJitterY: number = 0;
+
     initState(lockRect: ActiveComponent, useLockpick: boolean, int: number, containerType: number){ // ъуъ
         this.lockRect = lockRect;
         this.correctAngle = randrange(5, 175);
         this.anglePrecision = containers[containerType];
         this.lockProgress = 0;
         this.timeWasStuck = 0;
-        // sounds[2]
         this.innerText = `Lock precision: ${this.anglePrecision.toFixed(1)} degree${this.anglePrecision > 1.0 ? "s" : ""}`;
+
+        this.beaten = false;
         if(useLockpick && int > 10){
             this.pickLevel = int - 10;
         }else{
@@ -67,24 +75,36 @@ class Lock{
         let num = this.pickLevel + 1;
         let num2 = 0;
         if(mouse.clicked && this.clicking_inside()){
-            // pickSound.volume = MoveTowards(volume, 1, delta*5)
+            pickLoop.play();
+            pickLoop.loop = true;
+
+            pickLoop.volume = moveTowards(pickLoop.volume, 1, delta*5);
             this.lockProgress += delta * (0.66 + num * 0.065);
             if(this.lockProgress >= this.MaxTurnProgress()){
                 this.lockProgress = this.MaxTurnProgress();
                 if(this.lockProgress == 1){
-                    // unlock sound
+                    this.beaten = false;
                     this.endMinigame(false);
                 }else{
-                    // break sound
                     /// * lockRect.anchoredPosition = Random.insideUnitCircle * 10f * timeWasStuck; - cs
+                    // need a link to the image here, it should randomly jitter in its (x,y) not (\alpha)
                     num2 = randrange(-10, 10) * this.timeWasStuck;
+
                     this.timeWasStuck += delta;
                     this.anglePrecision += delta * 0.03;
-                    // need a link to the image here, it should randomly jitter in its (x,y) not (\alpha)
+
+                    const radius = Math.sqrt(Math.random() * 10 * this.timeWasStuck);
+                    const angle = Math.random() * 2 * Math.PI;
+                    this.lockJitterX = Math.cos(angle) * radius;
+                    this.lockJitterY = Math.sin(angle) * radius;
+
                     if(this.timeWasStuck > 0.5){
                         if(this.pickLevel < 0){
                             this.trackPain += 20;
                             this.trackClawHealth -= 15;
+
+                            // NOTE - you could put play(gore2) there.
+
                             if(this.trackPain > 105){ // this is when you're most likely unconscious
                                 this.endMinigame(true);
                             }
@@ -96,7 +116,6 @@ class Lock{
                             }
                         }this.timeWasStuck = 0;
                     }
-                    // breakSound.stop()
                 }
             }
         }else{
@@ -106,15 +125,23 @@ class Lock{
         this.lockRect.angle = (0 - this.lockProgress) * 180 / 57.29578; // sanest radian enjoyer
         if(mouse.clicked == false){
             this.timeWasStuck = 0;
-            /// breakSound.stop()
+            pickLoop.pause();
         }
+    }
+
+    checkWin(){
+        /// this is a callback for lockpick.ts.
+        return this.lockProgress == 1;
     }
 
     endMinigame(fail: boolean){
         if(fail){
             // something something too much pain or lockpicking kit broke...
         }else{
-            // pass some call to render...
+            if(!this.beaten){
+                this.beaten = true;
+                unlockSound.play();
+            }
         }
     }
     
