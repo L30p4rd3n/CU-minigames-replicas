@@ -73,8 +73,7 @@ class Lock{
      
     handle_click(mouse: Mouse, delta: number){
         let num = this.pickLevel + 1;
-        let num2 = 0;
-        if(mouse.clicked && this.clicking_inside()){
+        if(mouse.clicked && this.clicking_inside() && !this.beaten){
             pickLoop.play();
             pickLoop.loop = true;
 
@@ -88,7 +87,6 @@ class Lock{
                 }else{
                     /// * lockRect.anchoredPosition = Random.insideUnitCircle * 10f * timeWasStuck; - cs
                     // need a link to the image here, it should randomly jitter in its (x,y) not (\alpha)
-                    num2 = randrange(-10, 10) * this.timeWasStuck;
 
                     this.timeWasStuck += delta;
                     this.anglePrecision += delta * 0.03;

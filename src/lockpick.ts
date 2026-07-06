@@ -25,7 +25,7 @@ ctx.imageSmoothingEnabled = false;
 const mouse: Mouse = {x: 0, y: 0, captured_output: 0, clicked: false};
 
 const minigame = new Lock();
-const LockRectImage = await loadImage("./assets/image/lockpickLock.png");
+const LockRectImage = await loadImage("assets/image/lockpickLock.png");
 // const LockBG = await loadImage("assets/image/bg.png");
 const LockArchImage = await loadImage("assets/image/lockpickArch.png");
  const plushImage = await loadImage("assets/image/experimentplush.png");
