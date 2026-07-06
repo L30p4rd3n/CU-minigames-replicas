@@ -1,6 +1,7 @@
 import {Lock, handAngle} from './lock.ts';
 import type { Mouse } from './mouse.ts';
 import type { ActiveComponent } from './buttons.ts';
+import { SCALE } from './util/constants.ts';
 
 import "./style.css"
 
@@ -10,7 +11,6 @@ const loadImage = (path: string): Promise<HTMLImageElement> => {
     return new Promise(r => {image.onload = () => r(image)});
 };
 
-const SCALE = 2.4;
 const WIDTH = 400;
 const HEIGHT = 400;
 
@@ -22,8 +22,8 @@ const ctx = canvas.getContext("2d")!;
 ctx.imageSmoothingEnabled = false;
 
 const mouse: Mouse = {x: 0, y: 0, captured_output: 0, clicked: false};
-const minigame = new Lock();
 
+const minigame = new Lock();
 const LockRectImage = await loadImage("./assets/image/lockpickLock.png");
 // const LockBG = await loadImage("assets/image/bg.png");
 const LockArchImage = await loadImage("assets/image/lockpickArch.png");
@@ -37,6 +37,8 @@ const lockRect: ActiveComponent = {
 minigame.initState(lockRect); // should have a restart, but oh well
 
 const drawBase = () => {
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     //ctx.drawImage(LockBG, 0, 0, LockBG.width, LockBG.height);
     ctx.drawImage(LockArchImage, 
                   lockRect.cx - LockArchImage.width / 2 * SCALE * 1.5,
@@ -80,7 +82,7 @@ const tickAction = (delta: number) => {
     // draw stuff accordingly idk
 }
 
-canvas.addEventListener("mousemove", (e: MouseEvent) =>{
+canvas.addEventListener("mousemove", (e: MouseEvent) => {
     let pos = getMousePos(e);
     mouse.x = pos.x;
     mouse.y = pos.y;
@@ -88,6 +90,8 @@ canvas.addEventListener("mousemove", (e: MouseEvent) =>{
 
 canvas.addEventListener("mousedown", () => {
     mouse.clicked = true;
+    minigame.justClickedX = mouse.x;
+    minigame.justClickedY = mouse.y;
 });
 
 canvas.addEventListener("mouseup", () => {
@@ -104,7 +108,7 @@ setInterval(() => {
         lastT = Date.now();
         return;
     }
-    const delta = (Date.now() - lastT);
+    const delta = (Date.now() - lastT) * 0.001;
     drawBase();
     tickAction(delta);
     logStats();
