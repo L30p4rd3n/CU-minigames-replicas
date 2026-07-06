@@ -28,7 +28,7 @@ class Lock{
         this.lockRect = lockRect;
         this.correctAngle = randrange(5, 175);
         // sounds[2]
-        this.innerText = `something something degrees, i can't remember and i didn't have the game open at that moment`;
+        this.innerText = `something something degrees`;
         // bool check for INT and lockpick sprites
         this.pickLevel = -1;
     }
@@ -47,7 +47,7 @@ class Lock{
         let num = this.pickLevel + 1;
 
         let num2 = 0;
-        if(this.clicking_inside(mouse)){
+        if(mouse.clicked && this.clicking_inside(mouse)){
             // pickSound.volume = MoveTowards(volume, 1, delta*5)
             this.lockProgress += delta * (0.66 + num * 0.065);
             if(this.lockProgress >= this.MaxTurnProgress(mouse)){
@@ -87,4 +87,4 @@ class Lock{
     
 }
 
-export { Lock };
+export { Lock, findCenter, handAngle };
