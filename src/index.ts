@@ -1,5 +1,6 @@
 import {Ctx} from "./context";
 import type { Mouse } from "./mouse";
+import { loadImage } from "./util/util";
 
 import "./style.css"
 
@@ -8,13 +9,6 @@ const SCALE = 1;
 
 // const updateRate = 60;
 // const DeltaTime = 1/updateRate;
-
-
-const loadImage = (path: string): Promise<HTMLImageElement> => {
-    const image = new Image();
-    image.src = path;
-    return new Promise(r => {image.onload = () => r(image)});
-};
 
 const buttonbuttons = [
     {

@@ -14,4 +14,10 @@ interface Codebox{
     stored_code: string;
 }
 
-export type {Button, Codebox}
+interface ActiveComponent {
+    cx: number;
+    cy: number;
+    angle: number;
+}
+
+export type {Button, Codebox, ActiveComponent}

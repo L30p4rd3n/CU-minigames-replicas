@@ -1,4 +1,4 @@
-import {inRange, randrange} from "./util/util";
+import {inRange, quickfire, randrange} from "./util/util";
 import type {Mouse} from "./mouse"
 import type {Button, Codebox} from "./buttons";
 
@@ -71,12 +71,10 @@ class Ctx{
 
         if(mouse.captured_output != -3){
             if(!(inRange(mouse.captured_output, 0, 9))){
-                const sound = new Audio(`assets/sound/beep0.ogg`)
-                sound.play();
+                quickfire(`assets/sound/beep0.ogg`);
                 this.reset(mouse.captured_output == -1); /// this will work for both the in-game reset button and the added-in re-generate button
             }else{
-                const sound = new Audio(`assets/sound/beep${mouse.captured_output}.ogg`)
-                sound.play();
+                quickfire(`assets/sound/beep${mouse.captured_output}.ogg`);
                 if(this.entered_code.length >= this.stored_code.length){
                     return;
                 }
