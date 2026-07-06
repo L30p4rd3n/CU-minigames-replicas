@@ -45,7 +45,7 @@ class Lock{
         this.innerText = `Lock precision: ${this.anglePrecision.toFixed(1)} degree${this.anglePrecision > 1.0 ? "s" : ""}`;
 
         this.beaten = false;
-        if(useLockpick && int > 10){
+        if(useLockpick && int >= 10){
             this.pickLevel = int - 10;
         }else{
             this.pickLevel = -1;
