@@ -15,10 +15,8 @@ interface Codebox{
 }
 
 interface ActiveComponent {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
+    cx: number;
+    cy: number;
     angle: number;
 }
 

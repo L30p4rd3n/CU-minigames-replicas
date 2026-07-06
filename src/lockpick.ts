@@ -1,9 +1,8 @@
-import {Lock, findCenter, handAngle} from './lock.ts';
+import {Lock, handAngle} from './lock.ts';
 import type { Mouse } from './mouse.ts';
 import type { ActiveComponent } from './buttons.ts';
 
 import "./style.css"
-import { relativeX, relativeY } from './util/maths';
 
 const loadImage = (path: string): Promise<HTMLImageElement> => {
     const image = new Image();
@@ -12,8 +11,8 @@ const loadImage = (path: string): Promise<HTMLImageElement> => {
 };
 
 const SCALE = 2.4;
-const WIDTH = 500;
-const HEIGHT = 500;
+const WIDTH = 400;
+const HEIGHT = 400;
 
 const canvas = document.getElementById("main-canvas")! as HTMLCanvasElement;
 canvas.width = WIDTH * SCALE;
@@ -30,10 +29,8 @@ const LockRectImage = await loadImage("./assets/image/lockpickLock.png");
 const LockArchImage = await loadImage("assets/image/lockpickArch.png");
 
 const lockRect: ActiveComponent = {
-    x: 150,
-    y: 150,
-    width: LockRectImage.width,
-    height: LockRectImage.height,
+    cx: canvas.width / 2,
+    cy: 400,
     angle: 0
 };
 
@@ -41,7 +38,12 @@ minigame.initState(lockRect); // should have a restart, but oh well
 
 const drawBase = () => {
     //ctx.drawImage(LockBG, 0, 0, LockBG.width, LockBG.height);
-    ctx.drawImage(LockArchImage, 0, 0, LockArchImage.width * SCALE * 1.5, LockArchImage.height * SCALE * 1.5);
+    ctx.drawImage(LockArchImage, 
+                  lockRect.cx - LockArchImage.width / 2 * SCALE * 1.5,
+                  lockRect.cy - LockArchImage.height * SCALE * 1.5,
+                  LockArchImage.width * SCALE * 1.5,
+                  LockArchImage.height * SCALE * 1.5
+                );
 
     ctx.fillStyle = "#ffffff";
     ctx.font = "42px Retro Gaming";
@@ -50,18 +52,26 @@ const drawBase = () => {
 
     ctx.save();
     
-    ctx.translate(canvas.width / 2 - LockRectImage.width / 2, 150);
+    ctx.translate(lockRect.cx, lockRect.cy);
     ctx.rotate(minigame.lockRect.angle);
-    ctx.drawImage(LockRectImage, 0, 0, LockRectImage.width * SCALE , LockRectImage.height * SCALE);
+    ctx.drawImage(LockRectImage,
+                 0 - LockRectImage.width / 2 * SCALE * 1.5,
+                 0 - LockRectImage.height / 2 * SCALE * 1.5,
+                 LockRectImage.width * SCALE * 1.5, 
+                 LockRectImage.height * SCALE * 1.5);
     ctx.restore();
 };
 
 
 function getMousePos(e: MouseEvent){
     let rect = canvas.getBoundingClientRect();
+
+    const absX = (e.clientX - rect.left) * (canvas.width / rect.width);
+    const absY = (e.clientY - rect.top) * (canvas.height / rect.height);
+
     return {
-        x: relativeX(e.clientX - rect.left, findCenter(lockRect).x) * (canvas.width / rect.width),
-        y: relativeY(e.clientY - rect.top, findCenter(lockRect).y) * (canvas.height / rect.height)
+        x: absX - lockRect.cx,
+        y: absY - lockRect.cy
     }
 }
 
@@ -78,7 +88,6 @@ canvas.addEventListener("mousemove", (e: MouseEvent) =>{
 
 canvas.addEventListener("mousedown", () => {
     mouse.clicked = true;
-    console.log(handAngle(mouse, lockRect));
 });
 
 canvas.addEventListener("mouseup", () => {

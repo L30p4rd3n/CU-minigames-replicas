@@ -1,15 +1,10 @@
 import type { ActiveComponent } from "./buttons";
 import type { Mouse } from "./mouse";
-import { Clamp, coordsToVector, Clamp01, magnitude, relativeX, relativeY } from "./util/maths";
+import { Clamp, Clamp01, magnitude } from "./util/maths";
 import { inRange, moveTowards, randrange, VectorToAngle } from "./util/util";
 
-const findCenter = (c: ActiveComponent) => {
-    return {x: c.x + c.width / 2, y: c.y + c.height / 2}
-}
-
-const handAngle = (mouse: Mouse, lockRect: ActiveComponent) => {
-    return VectorToAngle(coordsToVector(findCenter(lockRect).x, relativeX(mouse.x, findCenter(lockRect).x), 
-    findCenter(lockRect).y, relativeY(mouse.y, findCenter(lockRect).y)));
+const handAngle = (mouse: Mouse) => {
+    return VectorToAngle({x: -1 * mouse.x, y: mouse.y}) - 90;
 }
 
 class Lock{
@@ -33,11 +28,11 @@ class Lock{
         this.pickLevel = -1;
     }
     clicking_inside(mouse: Mouse){
-        return handAngle(mouse, this.lockRect) > 0 && handAngle(mouse, this.lockRect) < 180 && inRange(magnitude({x: mouse.x, y: mouse.y}), 195, 247); // might be relative...
+        return handAngle(mouse) > 0 && handAngle(mouse) < 180 && inRange(magnitude({x: mouse.x, y: mouse.y}), 195, 247);
     }
 
     MaxTurnProgress(mouse: Mouse){
-        let num: number = Math.abs(handAngle(mouse, this.lockRect) - this.correctAngle);
+        let num: number = Math.abs(handAngle(mouse) - this.correctAngle);
         if(num < this.anglePrecision){
             num = 0;
         }return Clamp01(1 - num / 90);
@@ -87,4 +82,4 @@ class Lock{
     
 }
 
-export { Lock, findCenter, handAngle };
+export { Lock, handAngle };

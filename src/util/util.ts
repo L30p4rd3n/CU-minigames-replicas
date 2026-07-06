@@ -12,7 +12,8 @@ function VectorToAngle(dir: Vector2){
     let num: number = Math.atan2(dir.x, dir.y) * 57.29578;
     if(num < 0){
         num += 360;
-    }return num;
+    }
+    return num;
 }
 
 function moveTowards(current: number, target: number, maxDelta: number){
