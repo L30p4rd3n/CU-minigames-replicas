@@ -1,4 +1,4 @@
-import {Lock, handAngle} from './lock.ts';
+import {Lock, handAngle } from './lock.ts';
 import type { Mouse } from './mouse.ts';
 import type { ActiveComponent } from './buttons.ts';
 import { SCALE } from './util/constants.ts';
@@ -34,12 +34,19 @@ const lockRect: ActiveComponent = {
     angle: 0
 };
 
-minigame.initState(lockRect); // should have a restart, but oh well
+let int: number = 10;
+let useLockpick: boolean = false;
+let containerType: number = 0;
+let hidden = true;
+let pain: number = 0;
+let clawHealth: number = 100;
+let lockpickDurability = 1;
+minigame.initState(lockRect, useLockpick, int, containerType);
 
 const drawBase = () => {
     ctx.fillStyle = "#000";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-    //ctx.drawImage(LockBG, 0, 0, LockBG.width, LockBG.height);
+    //ctx.drawImage(LockBG, 0, 0, LockBG.width, LockBG.height); // didn't find the bg image
     ctx.drawImage(LockArchImage, 
                   lockRect.cx - LockArchImage.width / 2 * SCALE * 1.5,
                   lockRect.cy - LockArchImage.height * SCALE * 1.5,
@@ -79,7 +86,6 @@ function getMousePos(e: MouseEvent){
 
 const tickAction = (delta: number) => {
     minigame.handle_click(mouse, delta);
-    // draw stuff accordingly idk
 }
 
 canvas.addEventListener("mousemove", (e: MouseEvent) => {
@@ -99,7 +105,22 @@ canvas.addEventListener("mouseup", () => {
 })
 
 const logStats = () => {
-    /// something something log some stats...
+    let logs = document.getElementById("logs")!;
+    logs.style = 'font-family: "Retro Gaming";src: url("assets/font/RetroGaming.ttf");text-rendering: optimizeSpeed; color: white';
+    if(!hidden){
+        logs.innerHTML = 
+        `<p>Stats:</p>
+        <p>INT: ${int}</p>
+        <p>correctAngle: ${minigame.correctAngle}</p>
+        <p>currentAngle: ${handAngle(minigame.justClickedX, minigame.justClickedY).toFixed(2)}</p>
+        <p>lockProgress: ${minigame.lockProgress.toFixed(2)}</p>
+        <p>Pain: ${minigame.trackPain}</p>
+        <p>Claw Health: ${minigame.trackClawHealth}</p>
+        <p>Lockpicking kit durability:${(useLockpick && int > 10) ? minigame.trackLockpick : "you're too dumb to use it :D"}</p>
+        `;
+    }else{
+        logs.innerHTML = ``;
+    }
 }
 
 let lastT = 0;
@@ -115,3 +136,28 @@ setInterval(() => {
     lastT = Date.now();
 }, 1000 / 60);
 drawBase();
+
+document.getElementById("addint")!.addEventListener("click", () => {
+    int += 1;
+});
+document.getElementById("removeint")!.addEventListener("click", () => {
+    int -= 1;
+});
+document.getElementById("uselockpick")!.addEventListener("click", () => {
+    useLockpick = !useLockpick;
+});
+document.getElementById("type1")!.addEventListener("click", () => {
+    containerType = 0;
+});
+document.getElementById("type2")!.addEventListener("click", () => {
+    containerType = 1;
+});
+document.getElementById("type3")!.addEventListener("click", () => {
+    containerType = 2;
+});
+document.getElementById("toggle-hidden")!.addEventListener("click", () => {
+    hidden = !hidden;
+});
+document.getElementById("restart")!.addEventListener("click", () => {
+    minigame.initState(lockRect, useLockpick, int, containerType);
+});

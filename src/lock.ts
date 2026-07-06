@@ -25,11 +25,16 @@ class Lock{
 
     innerText: string;
 
+    trackPain: number;
+    trackClawHealth: number;
+    trackLockpick: number;
+
     initState(lockRect: ActiveComponent, useLockpick: boolean, int: number, containerType: number){ // ъуъ
         this.lockRect = lockRect;
         this.correctAngle = randrange(5, 175);
         this.anglePrecision = containers[containerType];
         this.lockProgress = 0;
+        this.timeWasStuck = 0;
         // sounds[2]
         this.innerText = `Lock precision: ${this.anglePrecision.toFixed(1)} degree${this.anglePrecision > 1.0 ? "s" : ""}`;
         if(useLockpick && int > 10){
@@ -37,6 +42,13 @@ class Lock{
         }else{
             this.pickLevel = -1;
         }
+        
+
+        // NOTE - if you /really/ need to change that, just make callback funcitons changing those values.
+        this.trackClawHealth = 100;
+        this.trackPain = 0; 
+        this.trackLockpick = 1;
+
     }
     clicking_inside(){
         return handAngle(this.justClickedX, this.justClickedY) > 0 
@@ -60,9 +72,8 @@ class Lock{
             if(this.lockProgress >= this.MaxTurnProgress()){
                 this.lockProgress = this.MaxTurnProgress();
                 if(this.lockProgress == 1){
-                    
                     // unlock sound
-                    // end minigame (thinking of putting like a plushie img)
+                    this.endMinigame(false);
                 }else{
                     // break sound
                     /// * lockRect.anchoredPosition = Random.insideUnitCircle * 10f * timeWasStuck; - cs
@@ -70,15 +81,21 @@ class Lock{
                     this.timeWasStuck += delta;
                     this.anglePrecision += delta * 0.03;
                     // need a link to the image here, it should randomly jitter in its (x,y) not (\alpha)
-                    // something something code formatting, stored precision etc... this is for ActiveComponent part
                     if(this.timeWasStuck > 0.5){
                         if(this.pickLevel < 0){
-                            // pain (camera)
-                            // claw health (debug)
+                            this.trackPain += 20;
+                            this.trackClawHealth -= 15;
+                            if(this.trackPain > 105){ // this is when you're most likely unconscious
+                                this.endMinigame(true);
+                            }
                         }else{
-                            // lockpick state (debug + camera)
-                        }
-                    }this.timeWasStuck = 0;
+                            if(this.trackLockpick > 0){
+                                this.trackLockpick -= 0.03;
+                            }else{
+                                this.endMinigame(true);
+                            }
+                        }this.timeWasStuck = 0;
+                    }
                     // breakSound.stop()
                 }
             }
@@ -89,8 +106,15 @@ class Lock{
         this.lockRect.angle = (0 - this.lockProgress) * 180 / 57.29578; // sanest radian enjoyer
         if(mouse.clicked == false){
             this.timeWasStuck = 0;
-            /// clicking_inside is not really a property is it
             /// breakSound.stop()
+        }
+    }
+
+    endMinigame(fail: boolean){
+        if(fail){
+            // something something too much pain or lockpicking kit broke...
+        }else{
+            // pass some call to render...
         }
     }
     

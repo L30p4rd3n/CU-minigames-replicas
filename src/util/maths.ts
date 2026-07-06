@@ -36,17 +36,3 @@ function Lerp(a: number, b: number, t: number){
 }
 
 export {Clamp, Clamp01, Lerp}
-
-/* Coordinate math */
-// NOTE: works only if initial (0,0) is in 2nd quarter of new (0,0) = (x0, y0)
-// NOTE: the same {i,j} is used, without rotations
-const relativeX = (absX: number, anchorX: number) => {
-    return (anchorX - absX);
-}
-const relativeY = (absY: number, anchorY: number) => {
-    return (absY - anchorY);
-}
-
-
-export {relativeX, relativeY}
-
