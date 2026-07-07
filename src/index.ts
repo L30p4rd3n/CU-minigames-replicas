@@ -114,10 +114,8 @@ const keypad = new Ctx();
 keypad.buttons = buttonbuttons;
 keypad.codeboxes = codeboxes;
 keypad.generate_code();
-
-const keypadImage = await loadImage("assets/image/keypad.png");
-canvas.width = keypadImage.width;
-canvas.height = keypadImage.height;
+canvas.width = 942;
+canvas.height = 843;
 
 function getMousePos(e: MouseEvent){
     let rect = canvas.getBoundingClientRect();
@@ -153,11 +151,7 @@ const renderBox = (src: Button | Codebox) => {
         ctx.textAlign = 'center';
         ctx.font = '64px Retro Gaming';
         ctx.fillStyle = "#FFF";
-        if(src.output != -2){
-            ctx.fillText(src.output.toString(), src.x + src.width / 2 * SCALE, src.y + (src.height + 48) / 2 * SCALE);
-        }else{
-            ctx.fillText("C", src.x + src.width / 2 * SCALE, src.y + (src.height + 48) / 2 * SCALE);
-        }
+        ctx.fillText(src.output == -2 ? "C" : src.output.toString(), src.x + src.width / 2 * SCALE, src.y + (src.height + 48) / 2 * SCALE);
     }
 }
 
