@@ -1,6 +1,5 @@
 import {Ctx} from "./context";
 import type { Mouse } from "./mouse";
-import { loadImage } from "./util/util";
 
 import "./style.css"
 import type { Button, Codebox } from "./buttons";
