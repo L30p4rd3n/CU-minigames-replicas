@@ -1,3 +1,6 @@
+/*
+    TODO: Figure out whu mobile doesn't work
+*/
 import {Lock, handAngle } from './lock.ts';
 import type { Mouse } from './mouse.ts';
 import type { ActiveComponent } from './buttons.ts';
