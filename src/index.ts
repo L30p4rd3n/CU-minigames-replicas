@@ -1,8 +1,8 @@
 import {Ctx} from "./context";
 import type { Mouse } from "./mouse";
-import { loadImage } from "./util/util";
 
 import "./style.css"
+import type { Button, Codebox } from "./buttons";
 
 const canvas = document.getElementById("main-canvas")! as HTMLCanvasElement;
 const SCALE = 1;
@@ -113,10 +113,8 @@ const keypad = new Ctx();
 keypad.buttons = buttonbuttons;
 keypad.codeboxes = codeboxes;
 keypad.generate_code();
-
-const keypadImage = await loadImage("assets/image/keypad.png");
-canvas.width = keypadImage.width;
-canvas.height = keypadImage.height;
+canvas.width = 942;
+canvas.height = 843;
 
 function getMousePos(e: MouseEvent){
     let rect = canvas.getBoundingClientRect();
@@ -141,9 +139,33 @@ canvas.addEventListener("mouseup", () => {
     mouse.captured_output = -3;
 })
 
-const draw_base = () => {
-    ctx.drawImage(keypadImage, 0, 0);
+const renderBox = (src: Button | Codebox) => {
+    ctx.globalAlpha = 0.8; // TODO - determine actual in-game alpha
+    ctx.fillStyle = "#FFF";
+    ctx.fillRect(src.x - 3*SCALE, src.y - 3*SCALE, src.width + 6*SCALE, src.height + 6*SCALE);
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = "#000";
+    ctx.fillRect(src.x, src.y, src.width, src.height);
+    if("output" in src){
+        ctx.textAlign = 'center';
+        ctx.font = '64px Retro Gaming';
+        ctx.fillStyle = "#FFF";
+        ctx.fillText(src.output == -2 ? "C" : src.output.toString(), src.x + src.width / 2 * SCALE, src.y + (src.height + 48) / 2 * SCALE);
+    }
+}
 
+
+const draw_base = () => {
+    ctx.fillStyle = "#FFF";
+    ctx.font = "22px Retro Gaming";
+    ctx.textAlign = 'center';
+    ctx.fillText("Match the code to open.", canvas.width / 2, 32);
+
+    for(let button = 0; button < buttonbuttons.length; button++){
+        renderBox(buttonbuttons[button]);
+    }for(let codebox = 0; codebox < codeboxes.length; codebox++){
+        renderBox(codeboxes[codebox]);
+    }
     ctx.fillStyle = "#FFF";
     ctx.font = '42px Retro Gaming';
     ctx.textAlign = 'center';
