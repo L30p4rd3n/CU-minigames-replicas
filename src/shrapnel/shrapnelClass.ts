@@ -1,9 +1,14 @@
 import { Hand, HandSpriteType } from "../hand/handClass"
-import type { Rect } from "../buttons";
+import { Rect } from "../buttons";
 import { inRange, randrange, randrangefloat } from "../util/util";
 import type { Mouse } from "../mouse";
-
+import { SCALE } from "../util/constants";
 let heldOffset = {x: 0, y: 0};
+
+function* yieldRect(amount: number){
+    for(let i = 0; i < amount; i++)
+        yield new Rect(0, 0, 0, 0);
+}
 
 class ShrapnelMinigame {
 
@@ -52,17 +57,14 @@ class ShrapnelMinigame {
         this.limb = limb;
         this.isHead();
 
-        for(let i = 0; i < 5; i++){
-            this.objects[i].x = 0; // TODO: change to Rect
-            this.objects[i].y = 0;
-        }
+        this.objects = Array.from(yieldRect(5));
+
         let num: number = 5 - shrapnelAmount;
         this.objects.forEach(element => { // spread
-            const radius = Math.sqrt(Math.random()) * 20; // TODO: check if number is too big
+            const radius = Math.sqrt(Math.random() * 40) ; // TODO: check if number is too big
             const angle = Math.random() * 2 * Math.PI;
             element.x += Math.cos(angle) * radius;
             element.y += Math.sin(angle) * radius;
-
             if(num > 0){
                 num--;
                 element.y += 8000;
@@ -92,6 +94,7 @@ class ShrapnelMinigame {
         }if(this.attachedMouse.clicked){ // TODO: add justClicked to mouse plspls
             for(let element = 0; element < 5; element++){
                 let rect = this.objects[element].getRect();
+                console.log(rect.lu.x, rect.ru.x, rect.lu.y, rect.ld.y, "mouse: ", this.attachedMouse.x, this.attachedMouse.y);
                 if(inRange(this.attachedMouse.x, rect.lu.x, rect.ru.x) && inRange(this.attachedMouse.y, rect.lu.y, rect.ld.y)){
                     this.currentlyHeld = this.objects[element];
                     heldOffset = this.objects[element].MouseOffset(this.attachedMouse);

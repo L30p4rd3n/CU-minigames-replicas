@@ -39,6 +39,14 @@ class Rect {
     MouseOffset = (mouse: Mouse): Vector2 => {
         return {x: mouse.x - this.x, y: mouse.y - this.y};
     }
+
+    constructor(x: number, y: number, width: number, height: number){
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+    }
 }
 
-export type {Button, Codebox, ActiveComponent, Rect}
+export { Rect }
+export type {Button, Codebox, ActiveComponent}

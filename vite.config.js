@@ -6,6 +6,7 @@ export default defineConfig({
       input: {
         main: 'index.html',
         lockpick: 'lockpick.html',
+        shrapnel: 'shrapnel.html'
       },
     },
   },
