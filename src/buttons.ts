@@ -1,3 +1,4 @@
+import type { Mouse } from "./mouse";
 import type { Vector2 } from "./util/maths";
 
 interface Button{
@@ -22,33 +23,22 @@ interface ActiveComponent {
     angle: number;
 }
 
-class RectTransform {
+class Rect {
     x: number;
     y: number;
-
-    anchoredX: number;
-    anchoredY: number;
-    angle: null | number;
 
     width: number;
     height: number;
 
     getRect = () => {
-        return {lu: {x: this.x - this.width / 2, y: this.y - this.height / 2}, 
-                ru: {x: this.x + this.width / 2, y: this.y - this.height / 2},
-                ld: {x: this.x - this.width / 2, y: this.y + this.height / 2},
-                rd: {x: this.x + this.width / 2, y: this.y + this.height / 2}};
+        return {lu: {x: this.x - this.width, y: this.y - this.height}, 
+                ru: {x: this.x + this.width, y: this.y - this.height},
+                ld: {x: this.x - this.width, y: this.y + this.height},
+                rd: {x: this.x + this.width, y: this.y + this.height}};
     }
-    anchoredPosition = (): Vector2 => {
-        return {x: this.anchoredX, y:this.anchoredY};
-    }
-
-    overlap(other: RectTransform){
-        let box1 = this.getRect();
-        let box2 = other.getRect();
-
-        if()
+    MouseOffset = (mouse: Mouse): Vector2 => {
+        return {x: mouse.x - this.x, y: mouse.y - this.y};
     }
 }
 
-export type {Button, Codebox, ActiveComponent, RectTransform}
+export type {Button, Codebox, ActiveComponent, Rect}

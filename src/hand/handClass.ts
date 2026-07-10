@@ -11,7 +11,8 @@ enum HandSpriteType{ // not particularly required everywhere
 
 class Hand{
     handType: HandSpriteType;
-    handVelocity: number = 0;
+    handVelocityX: number = 0;
+    handVelocityY: number = 0;
     handRotation: number = 0;
 
     handPos: Vector2;
