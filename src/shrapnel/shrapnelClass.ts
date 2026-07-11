@@ -90,7 +90,9 @@ class ShrapnelMinigame {
 
     Update(){ 
         // NOTE: there is a bug - if you start pulling out a piece, 
-        // then move the mouse away from canvas(vertically), then put it back in, the y of an object is -400.
+        // then move the mouse away from canvas(vertically), 
+        // then put it back in, the y of an object is -400.
+        // the bug is "fixed" with a band-aid solution of punishing the `player`.
         if(this.hasTweezers && this.shrapnelAmount == 0){
             this.endMinigame(-1);
         }if(this.attachedMouse.clicked && this.currentlyHeld == null && this.attachedMouse.y > -170){ // TODO: add justClicked to mouse plspls + handposY > -170f
@@ -104,7 +106,11 @@ class ShrapnelMinigame {
             };
         }//volume controls
 
-
+        // TODO: change RES param from a placeholder
+        this.attachedHand.x = this.attachedHand.getMousePos(this.attachedMouse, this.trackPain, 10).x; 
+        this.attachedHand.y = this.attachedHand.getMousePos(this.attachedMouse, this.trackPain, 10).y; 
+        console.log("HAND:", {x: this.attachedHand.x, y: this.attachedHand.y});
+        console.log("MOUSE: ", {x: this.attachedMouse.x, y: this.attachedMouse.y});
         //TODO: figure out hand position
         if(this.currentlyHeld != null){
             if(this.isShrapnelOut(this.currentlyHeld)){

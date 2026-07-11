@@ -36,7 +36,7 @@ const minigame = new ShrapnelMinigame();
 
 let hasTweezers = false;
 let limb = "HandF";
-let shrapnelAmount = 2;
+let shrapnelAmount = 5;
 minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);
 minigame.objects.forEach(element => {
     element.width = shrapnelImage.width;
@@ -79,6 +79,13 @@ canvas.addEventListener("mousedown", () => {
 canvas.addEventListener("mouseup", () => {
     mouse.clicked = false;
 })
+
+const drawHand = () => {
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "#CF07AA";
+    ctx.fillRect(minigame.attachedHand.x - 8, -minigame.attachedHand.y - 8, 16, 16);
+    ctx.globalAlpha = 1;
+}
 
 const drawBase = () => {
     ctx.fillStyle = "#000";
@@ -136,6 +143,7 @@ setInterval(() => {
     }
     const delta = (Date.now() - lastT) * 0.001;
     drawBase();
+    drawHand();
     tickAction(delta);
     logStats();
 
