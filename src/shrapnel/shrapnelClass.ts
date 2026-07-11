@@ -43,7 +43,7 @@ class ShrapnelMinigame {
         }return this.isLimbAHead;
     }
     isShrapnelOut(shrapnelPiece: Rect){
-        return (shrapnelPiece.y + shrapnelPiece.width / 2) >= 35; // @object.anchoredPosition.y < 35f for shrapnel++.
+        return (shrapnelPiece.y) >= 35; // @object.anchoredPosition.y < 35f for shrapnel++. this DOES NOT work with current Rect.
     }
 
     initState(hasTweezers: boolean, limb: string, shrapnelAmount: number, attachAMouse: Mouse){
@@ -61,10 +61,10 @@ class ShrapnelMinigame {
 
         let num: number = 5 - shrapnelAmount;
         this.objects.forEach(element => { // spread
-            const radius = Math.sqrt(Math.random() * 40) ; // TODO: check if number is too big
+            const radius = Math.sqrt(Math.random())* 20 ; // TODO: check if number is too big
             const angle = Math.random() * 2 * Math.PI;
-            element.x += Math.cos(angle) * radius;
-            element.y += Math.sin(angle) * radius;
+            element.x += Math.cos(angle) * radius * SCALE;
+            element.y += -150 + Math.sin(angle) * radius;
             if(num > 0){
                 num--;
                 element.y += 8000;
@@ -88,14 +88,15 @@ class ShrapnelMinigame {
         }
     }
 
-    Update(){
+    Update(){ 
+        // NOTE: there is a bug - if you start pulling out a piece, 
+        // then move the mouse away from canvas(vertically), then put it back in, the y of an object is -400.
         if(this.hasTweezers && this.shrapnelAmount == 0){
             this.endMinigame(-1);
-        }if(this.attachedMouse.clicked){ // TODO: add justClicked to mouse plspls
+        }if(this.attachedMouse.clicked && this.currentlyHeld == null && this.attachedMouse.y > -170){ // TODO: add justClicked to mouse plspls + handposY > -170f
             for(let element = 0; element < 5; element++){
                 let rect = this.objects[element].getRect();
-                console.log(rect.lu.x, rect.ru.x, rect.lu.y, rect.ld.y, "mouse: ", this.attachedMouse.x, this.attachedMouse.y);
-                if(inRange(this.attachedMouse.x, rect.lu.x, rect.ru.x) && inRange(this.attachedMouse.y, rect.lu.y, rect.ld.y)){
+                if(inRange(this.attachedMouse.x, rect.lu.x, rect.ru.x) && inRange(this.attachedMouse.y, Math.min(rect.lu.y, rect.ld.y), Math.max(rect.lu.y, rect.ld.y))){
                     this.currentlyHeld = this.objects[element];
                     heldOffset = this.objects[element].MouseOffset(this.attachedMouse);
                     break;
@@ -103,28 +104,33 @@ class ShrapnelMinigame {
             };
         }//volume controls
 
+
+        //TODO: figure out hand position
         if(this.currentlyHeld != null){
             if(this.isShrapnelOut(this.currentlyHeld)){
-                this.currentlyHeld.x = this.attachedHand.handPos.x + heldOffset.x;
-                this.currentlyHeld.y = this.attachedHand.handPos.y + heldOffset.y;
+                this.currentlyHeld.x = this.attachedMouse.x + heldOffset.x;
+                this.currentlyHeld.y = this.attachedMouse.y + heldOffset.y;
             }else{
                 // currentlyheld.x stays the same
-                this.currentlyHeld.y = this.attachedHand.y + heldOffset.y;
+                this.currentlyHeld.y = this.attachedMouse.y + heldOffset.y;
                 if(Math.abs(this.attachedHand.handVelocityY) > 2.2 && !this.hasTweezers){
                     this.BreakGrasp();
                     return;
-                }if(Math.abs(this.currentlyHeld.x - this.attachedHand.handPos.x) > 42){
+                }
+                // NOTE: changed from 42(fixed in-game size) to account for dimensions
+                // TODO: change to attachedHand
+                if(Math.abs(this.currentlyHeld.x - this.attachedMouse.x) > Math.abs(this.currentlyHeld.getRect().lu.x - this.currentlyHeld.getRect().ru.x) / 2){ 
                     this.BreakGrasp();
                     return;
                 }
-            }if(this.currentlyHeld.y < -364){
-                this.currentlyHeld.y = -364;
+            }if(this.currentlyHeld.getRect().lu.y < -364){ 
+                this.currentlyHeld.y = -364 + this.currentlyHeld.height;
             }
         }
 
         let num: number = 0;
         this.objects.forEach(object => {
-            if(!this.isShrapnelOut(object)){ // i think a TODO: y + height / 2...
+            if(!this.isShrapnelOut(object)){
                 num++;
             }
         });
@@ -135,6 +141,14 @@ class ShrapnelMinigame {
         if(!this.attachedMouse.clicked){
             this.currentlyHeld = null;
         }
+
+        // this will still increase pain, probably because the hand position shifts instantly...
+        this.objects.forEach(element => {
+            if(element.getRect().lu.y < -364){
+                element.y = -364 + element.height;
+            }
+        })
+
     }
     endMinigame(endCode: number){
         switch(endCode){

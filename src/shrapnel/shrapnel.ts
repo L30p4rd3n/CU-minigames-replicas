@@ -13,6 +13,13 @@ const HEIGHT = 256;
 const backgroundImage = await loadImage("assets/image/minigameShrapnel.png");
 const shrapnelImage = await loadImage("assets/image/shrapnelPiece.png");
 
+const handGraspIdleImage = await loadImage("assets/image/handGraspIdle1.png");
+const handGraspClickImage = await loadImage("assets/image/handGraspClick.png")
+const sprites = {
+    Grasp: handGraspIdleImage,
+    GraspClick: handGraspClickImage
+};
+
 const canvas = document.getElementById("main-canvas")! as HTMLCanvasElement;
 canvas.width = WIDTH * SCALE;
 canvas.height = HEIGHT * SCALE;
@@ -32,9 +39,8 @@ let limb = "HandF";
 let shrapnelAmount = 2;
 minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);
 minigame.objects.forEach(element => {
-    element.x = randrange(-(canvas.width / 7), (canvas.width / 7))
-    element.width = shrapnelImage.width / 2 * SCALE;
-    element.height = shrapnelImage.height / 2 * SCALE; 
+    element.width = shrapnelImage.width;
+    element.height = shrapnelImage.height;
 })
 
 // TODO: move to mouse.ts 
@@ -51,6 +57,7 @@ function getMousePos(e: MouseEvent){
 }
 
 let velocityVector: Vector2 = {x: 0, y: 0};
+let hasMoved: boolean = false;
 
 canvas.addEventListener("mousemove", (e: MouseEvent) =>{
     backtrackMouse.x = mouse.x;
@@ -59,9 +66,9 @@ canvas.addEventListener("mousemove", (e: MouseEvent) =>{
     let pos = getMousePos(e);
     mouse.x = pos.x - canvas.width / 2;
     mouse.y = -1 * (pos.y - canvas.height / 2);
-    
+
     velocityVector = coordsToVector(backtrackMouse.x, mouse.x, backtrackMouse.y, mouse.y); // divided by SCALE
-    //console.log(velocityVector);
+    hasMoved = true;
 });
 
 canvas.addEventListener("mousedown", () => {
@@ -75,24 +82,46 @@ canvas.addEventListener("mouseup", () => {
 
 const drawBase = () => {
     ctx.fillStyle = "#000";
-    ctx.fillRect(0, -canvas.height / 2, canvas.width, canvas.height);
+    ctx.fillRect(-(canvas.width / 2), -canvas.height / 2, canvas.width, canvas.height);
 
     minigame.objects.forEach(element => { // shrapnel is overlapped by BG
         let boundingbox = element.getRect();
-        ctx.drawImage(shrapnelImage, boundingbox.lu.x * SCALE, boundingbox.lu.y * SCALE, shrapnelImage.width * SCALE, shrapnelImage.height * SCALE);
-    })
-    ctx.drawImage(backgroundImage, -(canvas.width / 2 * 1.5), 0, canvas.width * 1.5, backgroundImage.height * SCALE);
+        ctx.drawImage(shrapnelImage, element.x - element.width, -element.y - element.height, (boundingbox.ru.x - boundingbox.lu.x), Math.abs(boundingbox.lu.y - boundingbox.ld.y));
+        /* debug item hitboxes. TODO: add a toggle switch
+        ctx.fillStyle = "#F00"
+        ctx.globalAlpha = 0.5;
+        ctx.fillRect(boundingbox.lu.x, -element.y - element.height, 
+                    (boundingbox.ru.x - boundingbox.lu.x), 
+                    Math.abs(boundingbox.lu.y - boundingbox.ld.y));
+        ctx.globalAlpha = 1;
+        */
+    });
+    ctx.drawImage(backgroundImage, -backgroundImage.width * SCALE, 102, backgroundImage.width * SCALE * 2, backgroundImage.height * SCALE * 2); // I HATE THIS
+    /*debug collision boxes
+    ctx.globalAlpha = 0.5;
+    ctx.fillStyle = "#F80"
+    ctx.fillRect(-(canvas.width / 2 * 1.5), canvas.height / 2 - 170, canvas.width * 1.5, backgroundImage.height * SCALE);
+    ctx.fillStyle = "#0F0";
+    ctx.fillRect(-(canvas.width / 2 * 1.5), 170, canvas.width * 1.5, backgroundImage.height * SCALE);
+    ctx.globalAlpha = 1;
+    */
     //TODO: draw corresponding hand
 }
 
 const logStats = () => {
-    /// log some stats, based on current settings
+    let logs = document.getElementById("logs")!;
+    logs.style = 'font-family: "Retro Gaming";src: url("assets/font/RetroGaming.ttf");text-rendering: optimizeSpeed; color: white';
+    logs.innerHTML = `pain: ${minigame.trackPain.toFixed(2)}`
 }
 
 const tickAction = (delta: number) => {
+    // TODO + NOTE: i have no fucking clue how to scale it
+    minigame.attachedHand.handVelocityX = velocityVector.x / delta / canvas.width * SCALE * SCALE;
+    minigame.attachedHand.handVelocityY = velocityVector.y / delta / canvas.height * SCALE * SCALE; // what the fuck
     minigame.Update();
+    
     if(minigame.trackPain > 0){
-        // TODO; actual pain decrease value
+        // TODO: actual pain decrease value
         minigame.trackPain -= delta;
     }if(minigame.trackPain < 0){
         minigame.trackPain = 0;
@@ -109,6 +138,11 @@ setInterval(() => {
     drawBase();
     tickAction(delta);
     logStats();
+
+    if(!hasMoved){
+        velocityVector = {x: 0, y: 0};
+    }
+    hasMoved = false;
     lastT = Date.now();
 }, 1000 / 60);
 drawBase();

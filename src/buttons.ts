@@ -37,7 +37,7 @@ class Rect {
                 rd: {x: this.x + this.width, y: this.y + this.height}};
     }
     MouseOffset = (mouse: Mouse): Vector2 => {
-        return {x: mouse.x - this.x, y: mouse.y - this.y};
+        return {x: this.x - mouse.x, y: this.y - mouse.y};
     }
 
     constructor(x: number, y: number, width: number, height: number){
