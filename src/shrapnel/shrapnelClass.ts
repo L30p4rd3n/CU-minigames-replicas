@@ -26,7 +26,7 @@ class ShrapnelMinigame {
     trackSkinHealth: number = 100;
     trackBleedAmount: number = 0;
 
-    isLimbAHead: boolean // :braindamage:
+    isLimbAHead: boolean
     trackBrainHealth: number = 100;
 
     currentlyHeld: Rect | null
@@ -43,7 +43,7 @@ class ShrapnelMinigame {
         }return this.isLimbAHead;
     }
     isShrapnelOut(shrapnelPiece: Rect){
-        return (shrapnelPiece.y) >= 35; // @object.anchoredPosition.y < 35f for shrapnel++. this DOES NOT work with current Rect.
+        return (shrapnelPiece.y) >= 35;
     }
 
     initState(hasTweezers: boolean, limb: string, shrapnelAmount: number, attachAMouse: Mouse){
@@ -61,7 +61,7 @@ class ShrapnelMinigame {
 
         let num: number = 5 - shrapnelAmount;
         this.objects.forEach(element => { // spread
-            const radius = Math.sqrt(Math.random())* 20 ; // TODO: check if number is too big
+            const radius = Math.sqrt(Math.random())* 20 ;
             const angle = Math.random() * 2 * Math.PI;
             element.x += Math.cos(angle) * radius * SCALE;
             element.y += -150 + Math.sin(angle) * radius;
@@ -70,11 +70,9 @@ class ShrapnelMinigame {
                 element.y += 8000;
             }
         });
-
-        // do something with the hand/
     }
 
-    BreakGrasp(){ // add in hand track
+    BreakGrasp(){
         if(this.currentlyHeld){
             this.currentlyHeld = null;
             this.attachedMouse.clicked = false;
@@ -95,37 +93,30 @@ class ShrapnelMinigame {
         // the bug is "fixed" with a band-aid solution of punishing the `player`.
         if(this.hasTweezers && this.shrapnelAmount == 0){
             this.endMinigame(-1);
-        }if(this.attachedMouse.clicked && this.currentlyHeld == null && this.attachedMouse.y > -170){ // TODO: add justClicked to mouse plspls + handposY > -170f
+        }if(this.attachedMouse.clicked && this.currentlyHeld == null && this.attachedHand.y > -170){
             for(let element = 0; element < 5; element++){
                 let rect = this.objects[element].getRect();
                 if(inRange(this.attachedMouse.x, rect.lu.x, rect.ru.x) && inRange(this.attachedMouse.y, Math.min(rect.lu.y, rect.ld.y), Math.max(rect.lu.y, rect.ld.y))){
                     this.currentlyHeld = this.objects[element];
-                    heldOffset = this.objects[element].MouseOffset(this.attachedMouse);
+                    heldOffset = this.objects[element].calcOffset(this.attachedHand);
                     break;
                 }
             };
         }//volume controls
-
-        // TODO: change RES param from a placeholder
         this.attachedHand.x = this.attachedHand.getMousePos(this.attachedMouse, this.trackPain, 10).x; 
         this.attachedHand.y = this.attachedHand.getMousePos(this.attachedMouse, this.trackPain, 10).y; 
-        console.log("HAND:", {x: this.attachedHand.x, y: this.attachedHand.y});
-        console.log("MOUSE: ", {x: this.attachedMouse.x, y: this.attachedMouse.y});
-        //TODO: figure out hand position
         if(this.currentlyHeld != null){
             if(this.isShrapnelOut(this.currentlyHeld)){
-                this.currentlyHeld.x = this.attachedMouse.x + heldOffset.x;
-                this.currentlyHeld.y = this.attachedMouse.y + heldOffset.y;
+                this.currentlyHeld.x = this.attachedHand.x + heldOffset.x;
+                this.currentlyHeld.y = this.attachedHand.y + heldOffset.y;
             }else{
-                // currentlyheld.x stays the same
-                this.currentlyHeld.y = this.attachedMouse.y + heldOffset.y;
-                if(Math.abs(this.attachedHand.handVelocityY) > 2.2 && !this.hasTweezers){
+                this.currentlyHeld.y = this.attachedHand.y + heldOffset.y;
+                if(Math.abs(this.attachedHand.handVelocityY) > 2.2 && !this.hasTweezers){ // what the actual fuck.
                     this.BreakGrasp();
                     return;
                 }
                 // NOTE: changed from 42(fixed in-game size) to account for dimensions
-                // TODO: change to attachedHand
-                if(Math.abs(this.currentlyHeld.x - this.attachedMouse.x) > Math.abs(this.currentlyHeld.getRect().lu.x - this.currentlyHeld.getRect().ru.x) / 2){ 
+                if(Math.abs(this.currentlyHeld.x - this.attachedHand.x) > Math.abs(this.currentlyHeld.getRect().lu.x - this.currentlyHeld.getRect().ru.x) / 2){ 
                     this.BreakGrasp();
                     return;
                 }

@@ -1,15 +1,14 @@
 import type { Mouse } from '../mouse.ts';
 import { ShrapnelMinigame } from './shrapnelClass.ts'
-import { loadImage, randrange } from '../util/util.ts';
+import { loadImage } from '../util/util.ts';
 import { SCALE } from '../util/constants.ts';
 
 import "../style.css"
-import { coordsToVector, type Vector2 } from '../util/maths.ts';
+import { Clamp, coordsToVector, type Vector2 } from '../util/maths.ts';
 
 const WIDTH = 400;
 const HEIGHT = 256;
 
-// bare minimum. TODO: hand images, sounds(that are not quickfired)
 const backgroundImage = await loadImage("assets/image/minigameShrapnel.png");
 const shrapnelImage = await loadImage("assets/image/shrapnelPiece.png");
 
@@ -27,10 +26,8 @@ canvas.height = HEIGHT * SCALE;
 const ctx = canvas.getContext("2d")!;
 ctx.imageSmoothingEnabled = false;
 
-/* run init stuff */
-// NOTE: new (0,0). now the relative coordinates are the same as absolute 
 ctx.translate(canvas.width / 2, canvas.height / 2);
-const mouse: Mouse = {x: 0, y: 0, captured_output: 0, clicked: false}; // now the mouse is also at new (0, 0)?
+const mouse: Mouse = {x: 0, y: 0, captured_output: 0, clicked: false};
 const backtrackMouse: Mouse = {x: 0, y: 0, captured_output: 0, clicked: false}
 const minigame = new ShrapnelMinigame();
 
@@ -41,6 +38,9 @@ minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);
 minigame.objects.forEach(element => {
     element.width = shrapnelImage.width;
     element.height = shrapnelImage.height;
+
+    element.x += (Math.random() * 250) - 125;
+    // TODO: probably maniputale some Y values as well
 })
 
 // TODO: move to mouse.ts 
@@ -48,7 +48,7 @@ function getMousePos(e: MouseEvent){
     let rect = canvas.getBoundingClientRect();
 
     const absX = (e.clientX - rect.left) * (canvas.width / rect.width);
-    const absY = (e.clientY - rect.top) * (canvas.height / rect.height); // ?? test if that works
+    const absY = (e.clientY - rect.top) * (canvas.height / rect.height); 
 
     return {
         x: absX,
@@ -63,11 +63,16 @@ canvas.addEventListener("mousemove", (e: MouseEvent) =>{
     backtrackMouse.x = mouse.x;
     backtrackMouse.y = mouse.y;
 
+
     let pos = getMousePos(e);
     mouse.x = pos.x - canvas.width / 2;
     mouse.y = -1 * (pos.y - canvas.height / 2);
 
-    velocityVector = coordsToVector(backtrackMouse.x, mouse.x, backtrackMouse.y, mouse.y); // divided by SCALE
+    // NOTE: this MIGHT NOT be a flawless calculation.
+    velocityVector = coordsToVector(minigame.attachedHand.getMousePos(backtrackMouse, minigame.trackPain, 10).x,
+                                    minigame.attachedHand.getMousePos(mouse, minigame.trackPain, 10).x,
+                                    minigame.attachedHand.getMousePos(backtrackMouse, minigame.trackPain, 10).y,
+                                    minigame.attachedHand.getMousePos(mouse, minigame.trackPain, 10).y);
     hasMoved = true;
 });
 
@@ -91,7 +96,7 @@ const drawBase = () => {
     ctx.fillStyle = "#000";
     ctx.fillRect(-(canvas.width / 2), -canvas.height / 2, canvas.width, canvas.height);
 
-    minigame.objects.forEach(element => { // shrapnel is overlapped by BG
+    minigame.objects.forEach(element => {
         let boundingbox = element.getRect();
         ctx.drawImage(shrapnelImage, element.x - element.width, -element.y - element.height, (boundingbox.ru.x - boundingbox.lu.x), Math.abs(boundingbox.lu.y - boundingbox.ld.y));
         /* debug item hitboxes. TODO: add a toggle switch
@@ -123,16 +128,11 @@ const logStats = () => {
 
 const tickAction = (delta: number) => {
     // TODO + NOTE: i have no fucking clue how to scale it
+    // TODO + NOTE: trackPain REALLY breaks it all...
     minigame.attachedHand.handVelocityX = velocityVector.x / delta / canvas.width * SCALE * SCALE;
     minigame.attachedHand.handVelocityY = velocityVector.y / delta / canvas.height * SCALE * SCALE; // what the fuck
     minigame.Update();
-    
-    if(minigame.trackPain > 0){
-        // TODO: actual pain decrease value
-        minigame.trackPain -= delta;
-    }if(minigame.trackPain < 0){
-        minigame.trackPain = 0;
-    }
+    minigame.trackPain = Clamp(minigame.trackPain - delta, 0, 105);
 }
 
 let lastT = 0;

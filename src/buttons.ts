@@ -1,3 +1,4 @@
+import type { Hand } from "./hand/handClass";
 import type { Mouse } from "./mouse";
 import type { Vector2 } from "./util/maths";
 
@@ -36,7 +37,7 @@ class Rect {
                 ld: {x: this.x - this.width, y: this.y + this.height},
                 rd: {x: this.x + this.width, y: this.y + this.height}};
     }
-    MouseOffset = (mouse: Mouse): Vector2 => {
+    calcOffset = (mouse: Mouse | Hand): Vector2 => {
         return {x: this.x - mouse.x, y: this.y - mouse.y};
     }
 
