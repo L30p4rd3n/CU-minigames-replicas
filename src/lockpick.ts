@@ -102,6 +102,10 @@ canvas.addEventListener("pointermove", (e: MouseEvent) => {
 });
 
 canvas.addEventListener("pointerdown", (e: MouseEvent) => {
+    let pos = getMousePos(e);
+    mouse.x = pos.x;
+    mouse.y = pos.y;
+    
     mouse.clicked = true;
     minigame.justClickedX = mouse.x;
     minigame.justClickedY = mouse.y;
