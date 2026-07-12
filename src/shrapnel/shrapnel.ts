@@ -29,6 +29,7 @@ const mouse: Mouse = {x: 0, y: 0, captured_output: 0, clicked: false};
 const backtrackMouse: Mouse = {x: 0, y: 0, captured_output: 0, clicked: false}
 const minigame = new ShrapnelMinigame();
 
+
 let hasTweezers = false;
 let limb = "HandF";
 let shrapnelAmount = 5;
@@ -39,7 +40,7 @@ const afterInit = () => {
         element.height = shrapnelImage.height;
 
         element.x += (Math.random() * 250) - 125;
-    // TODO: probably maniputale some Y values as well
+        element.y -= 60;
 })};
 afterInit();
 
@@ -56,7 +57,6 @@ function getMousePos(e: MouseEvent){
         y: absY
     }
 }
-let hasMoved: boolean = false;
 
 canvas.addEventListener("mousemove", (e: MouseEvent) =>{
     backtrackMouse.x = mouse.x;
@@ -66,7 +66,6 @@ canvas.addEventListener("mousemove", (e: MouseEvent) =>{
     let pos = getMousePos(e);
     mouse.x = pos.x - canvas.width / 2;
     mouse.y = -1 * (pos.y - canvas.height / 2);
-    hasMoved = true;
 });
 
 canvas.addEventListener("mousedown", () => {
@@ -135,7 +134,6 @@ const drawBase = () => {
     ctx.fillRect(-(canvas.width / 2 * 1.5), 170, canvas.width * 1.5, backgroundImage.height * SCALE);
     ctx.globalAlpha = 1;
     */
-    //TODO: draw corresponding hand
 }
 
 let hidden: boolean = true;
@@ -143,13 +141,22 @@ const logStats = () => {
     let logs = document.getElementById("logs")!;
     logs.style = 'font-family: "Retro Gaming";src: url("assets/font/RetroGaming.ttf");text-rendering: optimizeSpeed; color: white';
     if(!hidden){
-        logs.innerHTML = `<p>Stats:</p>
-        <p>Pain: ${minigame.trackPain.toFixed(2)}</p>
-        <p>Bleeding: ${"some"}</p>
-        <p>Skin health:</p>
-        <p>${minigame.isLimbAHead ? "Brain health: " + minigame.trackBrainHealth.toFixed(2) : ""}</p>
-        <p>Shards remaining: ${minigame.shrapnelAmount}</p>
-        `
+        if(minigame.beaten){
+            logs.innerHTML = "The game is beaten. Press Restart to restart the minigame";
+        }else{
+            logs.innerHTML =`<p>Stats:</p>
+                            <p>Pain: ${minigame.trackPain.toFixed(0)}</p>
+                            <p>Bleeding: ${(minigame.trackBleedAmount * 0.015).toFixed(3)} L/m</p>
+                            <p>Skin health: ${minigame.trackSkinHealth.toFixed(2)}</p>
+                            <p>${minigame.isLimbAHead ? "Brain health: " + minigame.trackBrainHealth.toFixed(2) : ""}</p>
+                            <p>Shards remaining: ${minigame.shrapnelAmount}</p>`
+        }
+        if(minigame.trackBrainHealth <= 30){
+            logs.innerHTML = `
+            <p>You're comatose. How did you even end up here?</p>
+            `
+        }
+        
     }else{
         logs.innerHTML = ``;
     }
@@ -157,7 +164,8 @@ const logStats = () => {
 
 const tickAction = (delta: number) => {
     minigame.Update();
-    minigame.trackPain = Clamp(minigame.trackPain - delta, 0, 105);
+    minigame.trackPain = Clamp(minigame.trackPain - delta, 0, 105); // in-game: 5*deltaTime, but there are more variables
+    // no other increase/decrease
 }
 
 let lastT = 0;
@@ -171,7 +179,6 @@ setInterval(() => {
     drawHand();
     tickAction(delta);
     logStats();
-    hasMoved = false;
     lastT = Date.now();
 }, 1000 / 60);
 drawBase();

@@ -3,7 +3,6 @@ import { Rect } from "../buttons";
 import { inRange, randrange, randrangefloat } from "../util/util";
 import type { Mouse } from "../mouse";
 import { SCALE } from "../util/constants";
-import { coordsToVector } from "../util/maths";
 let heldOffset = {x: 0, y: 0};
 
 function* yieldRect(amount: number){
@@ -60,6 +59,11 @@ class ShrapnelMinigame {
         this.limb = limb;
         this.isHead();
 
+        this.trackPain = 0;
+        this.trackBleedAmount = 0;
+        this.trackSkinHealth = 100;
+        this.trackBrainHealth = 100;
+
         this.objects = Array.from(yieldRect(5));
 
         let num: number = 5 - shrapnelAmount;
@@ -105,7 +109,10 @@ class ShrapnelMinigame {
                     break;
                 }
             };
-        }//volume controls
+        }
+        
+        //volume controls
+
         this.attachedHand.updateHandPhysics(this.attachedMouse, this.trackPain, 10, 10); // NOTE: also defaults
         if(this.currentlyHeld != null){
             if(this.isShrapnelOut(this.currentlyHeld)){
@@ -136,6 +143,8 @@ class ShrapnelMinigame {
         this.shrapnelAmount = num;
         if(num == 0){
             this.endMinigame(0);
+        }else{
+            this.beaten = false;
         }
         if(!this.attachedMouse.clicked){
             this.currentlyHeld = null;
@@ -148,6 +157,9 @@ class ShrapnelMinigame {
             }
         })
 
+        if(this.trackBrainHealth <= 30){
+            this.endMinigame(1);
+        }
     }
     endMinigame(endCode: number){
         switch(endCode){
@@ -155,7 +167,6 @@ class ShrapnelMinigame {
                 this.beaten = true;
                 break;
             }case 1:{
-                // too much pain or something, TODO: change accordingly.
                 break;
             }
         }
