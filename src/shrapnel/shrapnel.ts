@@ -14,10 +14,8 @@ const shrapnelImage = await loadImage("assets/image/shrapnelPiece.png");
 
 const handGraspIdleImage = await loadImage("assets/image/handGraspIdle1.png");
 const handGraspClickImage = await loadImage("assets/image/handGraspClick.png")
-const sprites = {
-    Grasp: handGraspIdleImage,
-    GraspClick: handGraspClickImage
-};
+const handTweezersIdleImage = await loadImage("assets/image/handTweezersIdle.png");
+const handTweezersClickImage = await loadImage("assets/image/handTweezersClick.png");
 
 const canvas = document.getElementById("main-canvas")! as HTMLCanvasElement;
 canvas.width = WIDTH * SCALE;
@@ -35,13 +33,16 @@ let hasTweezers = false;
 let limb = "HandF";
 let shrapnelAmount = 5;
 minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);
-minigame.objects.forEach(element => {
-    element.width = shrapnelImage.width;
-    element.height = shrapnelImage.height;
+const afterInit = () => {
+    minigame.objects.forEach(element => {
+        element.width = shrapnelImage.width;
+        element.height = shrapnelImage.height;
 
-    element.x += (Math.random() * 250) - 125;
+        element.x += (Math.random() * 250) - 125;
     // TODO: probably maniputale some Y values as well
-})
+})};
+afterInit();
+
 
 // TODO: move to mouse.ts 
 function getMousePos(e: MouseEvent){
@@ -78,9 +79,34 @@ canvas.addEventListener("mouseup", () => {
 })
 
 const drawHand = () => {
-    ctx.globalAlpha = 0.5;
-    ctx.fillStyle = "#CF07AA";
-    ctx.fillRect(minigame.attachedHand.x - 8, -minigame.attachedHand.y - 8, 16, 16);
+    ctx.globalAlpha = 0.75;
+    // ctx.fillStyle = "#CF07AA";
+    // ctx.fillRect(minigame.attachedHand.x - 8, -minigame.attachedHand.y - 8, 16, 16);
+    if(mouse.clicked){
+        if(!minigame.hasTweezers){
+            ctx.drawImage(handGraspClickImage, minigame.attachedHand.x - handGraspClickImage.width / 2 - shrapnelImage.width - 15, 
+                        -minigame.attachedHand.y  - handGraspClickImage.height / 4 - 60, 
+                        handGraspClickImage.width * SCALE, 
+                        handGraspClickImage.height * SCALE)
+        }else{
+            ctx.drawImage(handTweezersClickImage, minigame.attachedHand.x - handGraspClickImage.width / 2 - shrapnelImage.width - 15, 
+                        -minigame.attachedHand.y  - handGraspClickImage.height / 4 - 60, 
+                        handGraspClickImage.width * SCALE, 
+                        handGraspClickImage.height * SCALE)
+        }
+    }else{
+        if(!minigame.hasTweezers){
+            ctx.drawImage(handGraspIdleImage, minigame.attachedHand.x - handGraspClickImage.width / 2 - shrapnelImage.width - 15, 
+                        -minigame.attachedHand.y - handGraspClickImage.height / 4 - 60, 
+                        handGraspIdleImage.width * SCALE, 
+                        handGraspIdleImage.height * SCALE)
+        }else{
+            ctx.drawImage(handTweezersIdleImage, minigame.attachedHand.x - handGraspClickImage.width / 2 - shrapnelImage.width - 15, 
+                        -minigame.attachedHand.y  - handGraspClickImage.height / 4 - 60, 
+                        handGraspClickImage.width * SCALE, 
+                        handGraspClickImage.height * SCALE)
+        }
+    }
     ctx.globalAlpha = 1;
 }
 
@@ -112,10 +138,21 @@ const drawBase = () => {
     //TODO: draw corresponding hand
 }
 
+let hidden: boolean = true;
 const logStats = () => {
     let logs = document.getElementById("logs")!;
     logs.style = 'font-family: "Retro Gaming";src: url("assets/font/RetroGaming.ttf");text-rendering: optimizeSpeed; color: white';
-    logs.innerHTML = `pain: ${minigame.trackPain.toFixed(2)}`
+    if(!hidden){
+        logs.innerHTML = `<p>Stats:</p>
+        <p>Pain: ${minigame.trackPain.toFixed(2)}</p>
+        <p>Bleeding: ${"some"}</p>
+        <p>Skin health:</p>
+        <p>${minigame.isLimbAHead ? "Brain health: " + minigame.trackBrainHealth.toFixed(2) : ""}</p>
+        <p>Shards remaining: ${minigame.shrapnelAmount}</p>
+        `
+    }else{
+        logs.innerHTML = ``;
+    }
 }
 
 const tickAction = (delta: number) => {
@@ -139,3 +176,32 @@ setInterval(() => {
 }, 1000 / 60);
 drawBase();
 
+
+document.getElementById("ahead")!.addEventListener("click", () => {
+    limb = `${minigame.isLimbAHead ? "HandF" : "Head"}`;
+    minigame.isLimbAHead = ! minigame.isLimbAHead;
+    minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);   
+    afterInit();
+});
+document.getElementById("usetweezers")!.addEventListener("click", () => {
+    hasTweezers = !hasTweezers;
+    minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);
+    afterInit();
+});
+document.getElementById("toggle-hidden")!.addEventListener("click", () => {
+    hidden = !hidden;
+});
+document.getElementById("restart")!.addEventListener("click", () => {
+    minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);   
+    afterInit();
+});
+document.getElementById("shr1")!.addEventListener("click", () => {
+    shrapnelAmount = Clamp(shrapnelAmount+1, 0, 5);
+    minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);   
+    afterInit();
+});
+document.getElementById("shr2")!.addEventListener("click", () => {
+    shrapnelAmount = Clamp(shrapnelAmount-1, 0, 5);
+    minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);  
+    afterInit(); 
+});

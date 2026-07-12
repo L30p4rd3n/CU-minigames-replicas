@@ -56,7 +56,6 @@ class Hand{
     
         this.handVelocityX = handVelocity.x;
         this.handVelocityY = handVelocity.y;
-        console.log(handVelocity);
         this.x += handVelocity.x * 2 * 2.4;
         this.y += handVelocity.y * 2 * 2.4;
     };
