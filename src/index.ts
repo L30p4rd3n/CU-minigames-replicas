@@ -124,17 +124,17 @@ function getMousePos(e: MouseEvent){
     }
 }
 
-canvas.addEventListener("mousemove", (e: MouseEvent) =>{
+canvas.addEventListener("pointermove", (e: MouseEvent) =>{
     let pos = getMousePos(e);
     mouse.x = pos.x;
     mouse.y = pos.y;
 });
 
-canvas.addEventListener("mousedown", () => {
+canvas.addEventListener("pointerdown", () => {
     keypad.check_click(mouse);
 });
 
-canvas.addEventListener("mouseup", () => {
+canvas.addEventListener("pointerup", () => {
     mouse.clicked = false;
     mouse.captured_output = -3;
 })

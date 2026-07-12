@@ -58,7 +58,7 @@ function getMousePos(e: MouseEvent){
     }
 }
 
-canvas.addEventListener("mousemove", (e: MouseEvent) =>{
+canvas.addEventListener("pointermove", (e: MouseEvent) =>{
     backtrackMouse.x = mouse.x;
     backtrackMouse.y = mouse.y;
 
@@ -68,12 +68,12 @@ canvas.addEventListener("mousemove", (e: MouseEvent) =>{
     mouse.y = -1 * (pos.y - canvas.height / 2);
 });
 
-canvas.addEventListener("mousedown", () => {
+canvas.addEventListener("pointerdown", () => {
     mouse.clicked = true;
     // minigame.justClickedX = mouse.x
 });
 
-canvas.addEventListener("mouseup", () => {
+canvas.addEventListener("pointerup", () => {
     mouse.clicked = false;
 })
 

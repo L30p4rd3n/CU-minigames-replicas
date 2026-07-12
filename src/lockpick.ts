@@ -95,13 +95,13 @@ const tickAction = (delta: number) => {
     minigame.handle_click(mouse, delta);
 }
 
-canvas.addEventListener("mousemove", (e: MouseEvent) => {
+canvas.addEventListener("pointermove", (e: MouseEvent) => {
     let pos = getMousePos(e);
     mouse.x = pos.x;
     mouse.y = pos.y;
 });
 
-canvas.addEventListener("mousedown", (e: MouseEvent) => {
+canvas.addEventListener("pointerdown", (e: MouseEvent) => {
     mouse.clicked = true;
     minigame.justClickedX = mouse.x;
     minigame.justClickedY = mouse.y;
@@ -116,7 +116,7 @@ canvas.addEventListener("mousedown", (e: MouseEvent) => {
     }
 });
 
-canvas.addEventListener("mouseup", () => {
+canvas.addEventListener("pointerup", () => {
     mouse.clicked = false;
 
     minigame.lockJitterX = 0;
