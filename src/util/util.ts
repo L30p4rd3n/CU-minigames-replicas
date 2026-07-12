@@ -7,6 +7,9 @@ function inRange(source: number, lowbound: number, highbound: number) : boolean{
 function randrange(a: number, b: number): number{ // a <= b
     return Math.floor(Math.random() * (Math.floor(b) - Math.floor(a)) + Math.floor(a));
 }
+function randrangefloat(a: number, b: number): number{
+    return Math.random() * (Math.floor(b) - Math.floor(a)) + Math.floor(a);
+}
 
 function VectorToAngle(dir: Vector2){
     let num: number = Math.atan2(dir.x, dir.y) * 57.29578;
@@ -32,4 +35,4 @@ const loadImage = (path: string): Promise<HTMLImageElement> => {
     return new Promise(r => {image.onload = () => r(image)});
 };
 
-export {inRange, randrange, VectorToAngle, moveTowards, quickfire, loadImage};
+export {inRange, randrange, randrangefloat, VectorToAngle, moveTowards, quickfire, loadImage};
