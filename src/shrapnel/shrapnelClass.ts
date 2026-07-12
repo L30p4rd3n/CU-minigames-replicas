@@ -3,6 +3,7 @@ import { Rect } from "../buttons";
 import { inRange, randrange, randrangefloat } from "../util/util";
 import type { Mouse } from "../mouse";
 import { SCALE } from "../util/constants";
+import { coordsToVector } from "../util/maths";
 let heldOffset = {x: 0, y: 0};
 
 function* yieldRect(amount: number){
@@ -103,15 +104,15 @@ class ShrapnelMinigame {
                 }
             };
         }//volume controls
-        this.attachedHand.x = this.attachedHand.getMousePos(this.attachedMouse, this.trackPain, 10).x; 
-        this.attachedHand.y = this.attachedHand.getMousePos(this.attachedMouse, this.trackPain, 10).y; 
+        this.attachedHand.updateHandPhysics(this.attachedMouse, this.trackPain, 10, 10); // NOTE: also defaults
+        console.log(this.attachedHand.handVelocityY);
         if(this.currentlyHeld != null){
             if(this.isShrapnelOut(this.currentlyHeld)){
                 this.currentlyHeld.x = this.attachedHand.x + heldOffset.x;
                 this.currentlyHeld.y = this.attachedHand.y + heldOffset.y;
             }else{
                 this.currentlyHeld.y = this.attachedHand.y + heldOffset.y;
-                if(Math.abs(this.attachedHand.handVelocityY) > 2.2 && !this.hasTweezers){ // what the actual fuck.
+                if(Math.abs(this.attachedHand.handVelocityY) > (2.2 / 2.4) && !this.hasTweezers){ // what the actual fuck.
                     this.BreakGrasp();
                     return;
                 }

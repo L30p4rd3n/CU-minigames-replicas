@@ -4,7 +4,7 @@ import { loadImage } from '../util/util.ts';
 import { SCALE } from '../util/constants.ts';
 
 import "../style.css"
-import { Clamp, coordsToVector, type Vector2 } from '../util/maths.ts';
+import { Clamp } from '../util/maths.ts';
 
 const WIDTH = 400;
 const HEIGHT = 256;
@@ -55,8 +55,6 @@ function getMousePos(e: MouseEvent){
         y: absY
     }
 }
-
-let velocityVector: Vector2 = {x: 0, y: 0};
 let hasMoved: boolean = false;
 
 canvas.addEventListener("mousemove", (e: MouseEvent) =>{
@@ -67,12 +65,6 @@ canvas.addEventListener("mousemove", (e: MouseEvent) =>{
     let pos = getMousePos(e);
     mouse.x = pos.x - canvas.width / 2;
     mouse.y = -1 * (pos.y - canvas.height / 2);
-
-    // NOTE: this MIGHT NOT be a flawless calculation.
-    velocityVector = coordsToVector(minigame.attachedHand.getMousePos(backtrackMouse, minigame.trackPain, 10).x,
-                                    minigame.attachedHand.getMousePos(mouse, minigame.trackPain, 10).x,
-                                    minigame.attachedHand.getMousePos(backtrackMouse, minigame.trackPain, 10).y,
-                                    minigame.attachedHand.getMousePos(mouse, minigame.trackPain, 10).y);
     hasMoved = true;
 });
 
@@ -127,10 +119,6 @@ const logStats = () => {
 }
 
 const tickAction = (delta: number) => {
-    // TODO + NOTE: i have no fucking clue how to scale it
-    // TODO + NOTE: trackPain REALLY breaks it all...
-    minigame.attachedHand.handVelocityX = velocityVector.x / delta / canvas.width * SCALE * SCALE;
-    minigame.attachedHand.handVelocityY = velocityVector.y / delta / canvas.height * SCALE * SCALE; // what the fuck
     minigame.Update();
     minigame.trackPain = Clamp(minigame.trackPain - delta, 0, 105);
 }
@@ -146,10 +134,6 @@ setInterval(() => {
     drawHand();
     tickAction(delta);
     logStats();
-
-    if(!hasMoved){
-        velocityVector = {x: 0, y: 0};
-    }
     hasMoved = false;
     lastT = Date.now();
 }, 1000 / 60);
