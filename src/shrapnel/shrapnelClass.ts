@@ -3,7 +3,6 @@ import { Rect } from "../buttons";
 import { inRange, randrange, randrangefloat } from "../util/util";
 import type { Mouse } from "../mouse";
 import { SCALE } from "../util/constants";
-import { coordsToVector } from "../util/maths";
 let heldOffset = {x: 0, y: 0};
 
 function* yieldRect(amount: number){
@@ -32,6 +31,8 @@ class ShrapnelMinigame {
 
     currentlyHeld: Rect | null
 
+    beaten: boolean = false;
+
     HandType(){
         if(!this.hasTweezers){
             return HandSpriteType.Grasp;
@@ -58,6 +59,11 @@ class ShrapnelMinigame {
         this.limb = limb;
         this.isHead();
 
+        this.trackPain = 0;
+        this.trackBleedAmount = 0;
+        this.trackSkinHealth = 100;
+        this.trackBrainHealth = 100;
+
         this.objects = Array.from(yieldRect(5));
 
         this.shrapnelAmount = shrapnelAmount;
@@ -73,6 +79,8 @@ class ShrapnelMinigame {
                 element.y += 8000;
             }
         });
+
+        this.beaten = false;
     }
 
     BreakGrasp(){
@@ -94,9 +102,7 @@ class ShrapnelMinigame {
         // then move the mouse away from canvas(vertically), 
         // then put it back in, the y of an object is -400.
         // the bug is "fixed" with a band-aid solution of punishing the `player`.
-        if(this.hasTweezers && this.shrapnelAmount == 0){
-            this.endMinigame(-1);
-        }if(this.attachedMouse.clicked && this.currentlyHeld == null && this.attachedHand.y > -170){
+        if(this.attachedMouse.clicked && this.currentlyHeld == null && this.attachedHand.y > -170){
             for(let element = 0; element < 5; element++){
                 let rect = this.objects[element].getRect();
                 if(inRange(this.attachedMouse.x, rect.lu.x, rect.ru.x) && inRange(this.attachedMouse.y, Math.min(rect.lu.y, rect.ld.y), Math.max(rect.lu.y, rect.ld.y))){
@@ -105,9 +111,11 @@ class ShrapnelMinigame {
                     break;
                 }
             };
-        }//volume controls
+        }
+        
+        //volume controls
+
         this.attachedHand.updateHandPhysics(this.attachedMouse, this.trackPain, 10, 10); // NOTE: also defaults
-        console.log(this.attachedHand.handVelocityY);
         if(this.currentlyHeld != null){
             if(this.isShrapnelOut(this.currentlyHeld)){
                 this.currentlyHeld.x = this.attachedHand.x + heldOffset.x;
@@ -137,6 +145,8 @@ class ShrapnelMinigame {
         this.shrapnelAmount = num;
         if(num == 0){
             this.endMinigame(0);
+        }else{
+            this.beaten = false;
         }
         if(!this.attachedMouse.clicked){
             this.currentlyHeld = null;
@@ -149,17 +159,16 @@ class ShrapnelMinigame {
             }
         })
 
+        if(this.trackBrainHealth <= 30){
+            this.endMinigame(1);
+        }
     }
     endMinigame(endCode: number){
         switch(endCode){
-            case -1:{
-                console.log("the game was not started");
-                break;
-            }case 0:{
-                console.log("success");
+            case 0:{
+                this.beaten = true;
                 break;
             }case 1:{
-                console.log("something something fail idk");
                 break;
             }
         }

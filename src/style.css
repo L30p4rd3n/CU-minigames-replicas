@@ -39,4 +39,5 @@ body{
 }
 canvas{
     -webkit-user-drag: none;
+    touch-action: none;
 }

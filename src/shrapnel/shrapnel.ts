@@ -14,10 +14,8 @@ const shrapnelImage = await loadImage("assets/image/shrapnelPiece.png");
 
 const handGraspIdleImage = await loadImage("assets/image/handGraspIdle1.png");
 const handGraspClickImage = await loadImage("assets/image/handGraspClick.png")
-const sprites = {
-    Grasp: handGraspIdleImage,
-    GraspClick: handGraspClickImage
-};
+const handTweezersIdleImage = await loadImage("assets/image/handTweezersIdle.png");
+const handTweezersClickImage = await loadImage("assets/image/handTweezersClick.png");
 
 const canvas = document.getElementById("main-canvas")! as HTMLCanvasElement;
 canvas.width = WIDTH * SCALE;
@@ -31,17 +29,21 @@ const mouse: Mouse = {x: 0, y: 0, captured_output: 0, clicked: false};
 const backtrackMouse: Mouse = {x: 0, y: 0, captured_output: 0, clicked: false}
 const minigame = new ShrapnelMinigame();
 
+
 let hasTweezers = false;
 let limb = "HandF";
 let shrapnelAmount = 5;
 minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);
-minigame.objects.forEach(element => {
-    element.width = shrapnelImage.width;
-    element.height = shrapnelImage.height;
+const afterInit = () => {
+    minigame.objects.forEach(element => {
+        element.width = shrapnelImage.width;
+        element.height = shrapnelImage.height;
 
-    element.x += (Math.random() * 250) - 125;
-    // TODO: probably maniputale some Y values as well
-})
+        element.x += (Math.random() * 250) - 125;
+        element.y -= 60;
+})};
+afterInit();
+
 
 // TODO: move to mouse.ts 
 function getMousePos(e: MouseEvent){
@@ -55,9 +57,8 @@ function getMousePos(e: MouseEvent){
         y: absY
     }
 }
-let hasMoved: boolean = false;
 
-canvas.addEventListener("mousemove", (e: MouseEvent) =>{
+canvas.addEventListener("pointermove", (e: MouseEvent) =>{
     backtrackMouse.x = mouse.x;
     backtrackMouse.y = mouse.y;
 
@@ -65,22 +66,46 @@ canvas.addEventListener("mousemove", (e: MouseEvent) =>{
     let pos = getMousePos(e);
     mouse.x = pos.x - canvas.width / 2;
     mouse.y = -1 * (pos.y - canvas.height / 2);
-    hasMoved = true;
 });
 
-canvas.addEventListener("mousedown", () => {
+canvas.addEventListener("pointerdown", () => {
     mouse.clicked = true;
     // minigame.justClickedX = mouse.x
 });
 
-canvas.addEventListener("mouseup", () => {
+canvas.addEventListener("pointerup", () => {
     mouse.clicked = false;
 })
 
 const drawHand = () => {
-    ctx.globalAlpha = 0.5;
-    ctx.fillStyle = "#CF07AA";
-    ctx.fillRect(minigame.attachedHand.x - 8, -minigame.attachedHand.y - 8, 16, 16);
+    ctx.globalAlpha = 0.75;
+    // ctx.fillStyle = "#CF07AA";
+    // ctx.fillRect(minigame.attachedHand.x - 8, -minigame.attachedHand.y - 8, 16, 16);
+    if(mouse.clicked){
+        if(!minigame.hasTweezers){
+            ctx.drawImage(handGraspClickImage, minigame.attachedHand.x - handGraspClickImage.width / 2 - shrapnelImage.width - 15, 
+                        -minigame.attachedHand.y  - handGraspClickImage.height / 4 - 60, 
+                        handGraspClickImage.width * SCALE, 
+                        handGraspClickImage.height * SCALE)
+        }else{
+            ctx.drawImage(handTweezersClickImage, minigame.attachedHand.x - handGraspClickImage.width / 2 - shrapnelImage.width - 15, 
+                        -minigame.attachedHand.y  - handGraspClickImage.height / 4 - 60, 
+                        handGraspClickImage.width * SCALE, 
+                        handGraspClickImage.height * SCALE)
+        }
+    }else{
+        if(!minigame.hasTweezers){
+            ctx.drawImage(handGraspIdleImage, minigame.attachedHand.x - handGraspClickImage.width / 2 - shrapnelImage.width - 15, 
+                        -minigame.attachedHand.y - handGraspClickImage.height / 4 - 60, 
+                        handGraspIdleImage.width * SCALE, 
+                        handGraspIdleImage.height * SCALE)
+        }else{
+            ctx.drawImage(handTweezersIdleImage, minigame.attachedHand.x - handGraspClickImage.width / 2 - shrapnelImage.width - 15, 
+                        -minigame.attachedHand.y  - handGraspClickImage.height / 4 - 60, 
+                        handGraspClickImage.width * SCALE, 
+                        handGraspClickImage.height * SCALE)
+        }
+    }
     ctx.globalAlpha = 1;
 }
 
@@ -109,18 +134,38 @@ const drawBase = () => {
     ctx.fillRect(-(canvas.width / 2 * 1.5), 170, canvas.width * 1.5, backgroundImage.height * SCALE);
     ctx.globalAlpha = 1;
     */
-    //TODO: draw corresponding hand
 }
 
+let hidden: boolean = true;
 const logStats = () => {
     let logs = document.getElementById("logs")!;
     logs.style = 'font-family: "Retro Gaming";src: url("assets/font/RetroGaming.ttf");text-rendering: optimizeSpeed; color: white';
-    logs.innerHTML = `pain: ${minigame.trackPain.toFixed(2)}`
+    if(!hidden){
+        if(minigame.beaten){
+            logs.innerHTML = "The game is beaten. Press Restart to restart the minigame";
+        }else{
+            logs.innerHTML =`<p>Stats:</p>
+                            <p>Pain: ${minigame.trackPain.toFixed(0)}</p>
+                            <p>Bleeding: ${(minigame.trackBleedAmount * 0.015).toFixed(3)} L/m</p>
+                            <p>Skin health: ${minigame.trackSkinHealth.toFixed(2)}</p>
+                            <p>${minigame.isLimbAHead ? "Brain health: " + minigame.trackBrainHealth.toFixed(2) : ""}</p>
+                            <p>Shards remaining: ${minigame.shrapnelAmount}</p>`
+        }
+        if(minigame.trackBrainHealth <= 30){
+            logs.innerHTML = `
+            <p>You're comatose. How did you even end up here?</p>
+            `
+        }
+        
+    }else{
+        logs.innerHTML = ``;
+    }
 }
 
 const tickAction = (delta: number) => {
     minigame.Update();
-    minigame.trackPain = Clamp(minigame.trackPain - delta, 0, 105);
+    minigame.trackPain = Clamp(minigame.trackPain - delta, 0, 105); // in-game: 5*deltaTime, but there are more variables
+    // no other increase/decrease
 }
 
 let lastT = 0;
@@ -134,8 +179,36 @@ setInterval(() => {
     drawHand();
     tickAction(delta);
     logStats();
-    hasMoved = false;
     lastT = Date.now();
 }, 1000 / 60);
 drawBase();
 
+
+document.getElementById("ahead")!.addEventListener("click", () => {
+    limb = `${minigame.isLimbAHead ? "HandF" : "Head"}`;
+    minigame.isLimbAHead = ! minigame.isLimbAHead;
+    minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);   
+    afterInit();
+});
+document.getElementById("usetweezers")!.addEventListener("click", () => {
+    hasTweezers = !hasTweezers;
+    minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);
+    afterInit();
+});
+document.getElementById("toggle-hidden")!.addEventListener("click", () => {
+    hidden = !hidden;
+});
+document.getElementById("restart")!.addEventListener("click", () => {
+    minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);   
+    afterInit();
+});
+document.getElementById("shr1")!.addEventListener("click", () => {
+    shrapnelAmount = Clamp(shrapnelAmount+1, 0, 5);
+    minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);   
+    afterInit();
+});
+document.getElementById("shr2")!.addEventListener("click", () => {
+    shrapnelAmount = Clamp(shrapnelAmount-1, 0, 5);
+    minigame.initState(hasTweezers, limb, shrapnelAmount, mouse);  
+    afterInit(); 
+});
