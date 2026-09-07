@@ -52,7 +52,7 @@ const drawBase = () => {
     if(!minigame.beaten){
         ctx.drawImage(LockArchImage, 
                     lockRect.cx - LockArchImage.width / 2 * SCALE * 1.5,
-                    lockRect.cy - LockArchImage.height * SCALE * 1.5,
+                    lockRect.cy - LockArchImage.height * SCALE * 1.5, // huh?
                     LockArchImage.width * SCALE * 1.5,
                     LockArchImage.height * SCALE * 1.5
                     );
