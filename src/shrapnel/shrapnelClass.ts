@@ -60,6 +60,8 @@ class ShrapnelMinigame {
 
         this.objects = Array.from(yieldRect(5));
 
+        this.shrapnelAmount = shrapnelAmount;
+        
         let num: number = 5 - shrapnelAmount;
         this.objects.forEach(element => { // spread
             const radius = Math.sqrt(Math.random())* 20 ;
