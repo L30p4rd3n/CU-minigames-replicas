@@ -1,5 +1,17 @@
 (async function () {
-    // this version might get cleaned up and refactored
+    /**
+     * 
+     * Syringe minigame copy for Casualties:Unknown Wiki. Original game by Orsoniks
+     * 
+     * Author of the copy: L30p4rd3n
+     * 
+     * Source code also available here: 
+     * https://github.com/L30p4rd3n/CU-minigames-replicas
+     * 
+     * Casualties:Unknown Wiki is available here:
+     * https://casualtiesunknown.miraheze.org
+     * 
+     */
 
     // static links
 	const RETRO_FONT_URL = "https://static.wikitide.net/casualtiesunknownwiki/a/a7/Retro_Gaming.woff2";
@@ -40,6 +52,18 @@
     let conditionToGradient = window.CUCanvasBase.conditionToGradient;
 
     function colorLerp(a, b, t) {
+        /**
+         * 
+         * Takes two colors(HEX) and performs a linear extrapolation operation on all three of color components.
+         * 
+         * @param {string} a HEX code of current color
+         * @param {string} b HEX code of desired target color
+         * @param {number} t Coefficient (0-1) for extrapolation.
+         * 
+         * @returns {string} HEX code of a lerp'ed colour
+         * 
+         */
+
         let red = lerp(parseInt(a.slice(1, 3), 16), parseInt(b.slice(1,3), 16), t);
         let green = lerp(parseInt(a.slice(3, 5), 16), parseInt(b.slice(3, 5), 16), t);
         let blue = lerp(parseInt(a.slice(5), 16), parseInt(b.slice(5), 16), t);
@@ -89,66 +113,75 @@
         }
     }
 
+    /**
+     * Notes:
+     * - DoTimedOp for epinephrine is incomplete due to the limitations of the minigame **copy**
+     * - For the same reason, the stimulants' effects are omitted
+     * - Oxyline, on the other hand, is a TODO.
+     */
+
     const liquids = new Map([
         ["alcohol", new SyringeLiquid("#76e667", function(ml){  }, 0, "Alcohol", 0.75)],
         ["alienblood", new SyringeLiquid("#ffeb12", function(ml){ body.addEffects([new Effect("bloodVolume", 26 * ml / 750), new Effect("septicShock", 10 * ml / 750), new Effect("sicknessAmount", 20 * ml / 750)]) }, 0, "Alien blood", 0)],
-        ["amiodarone", new SyringeLiquid("#ffdcd4", function(ml){}, 0, "Amiodarone", 0)],
+        ["amiodarone", new SyringeLiquid("#ffdcd4", function(ml){body.addEffects([new Effect("muscleHealth", -0.25, true, 60 * ml / 20, "to Head, Thorax and Belly")]); if(body.effects["fibrillationProgress"] && body.effects["fibrillationProgress"].value){body.effects["fibrillationProgress"].desc = "fibrillationProgress -> 0 [-2/s]"}}, 0, "Amiodarone", 0)],
         ["antibiotics", new SyringeLiquid("#9e5dec", function(ml){  }, 0, "Antibiotics", 0.5)],
+        ["disinfectant", new SyringeLiquid("#c8ffff", function(ml){  }, 0, "Antiseptic", 1.25)],
         ["antidepressants", new SyringeLiquid("#64a185", function(ml){  }, 0, "Antidepressants", 0)],
         ["antirad", new SyringeLiquid("#fbc106", function(ml){  }, 0, "Anti-rad", 0)],
         ["antiserum", new SyringeLiquid("#753e5d", function(ml){ body.addEffects([new Effect("septicShock", -10 * ml * 0.02), new Effect("bloodVolume", 3 * ml * 0.02), new Effect("antibioticImmunityTime", 300 * ml * 0.02)]) }, 0, "Antiserum", 0)],
         ["antivenom", new SyringeLiquid("#4dff70", function(ml){ body.addEffects([new Effect("venomTotal", -ml * 0.02 * 40)]) }, 0, "Antivenom", 0)],
         ["applejuice", new SyringeLiquid("#c5ff61", function(ml){  }, 0, "Apple juice", 0.4)],
-        ["biochem", new SyringeLiquid("#b3ff25", function(ml){ body.addEffects([new Effect("sicknessAmount", ml * 0.01 * 100)]) }, 0, "Bio-chem fluid", 2)],
+        ["biochem", new SyringeLiquid("#b3ff25", function(ml){body.addEffects([new Effect("sicknessAmount", ml * 0.01 * 100), new Effect("SetDisinfect", 0, true, ml * 0.01 * 30), new Effect("pain", ml * 0.01 * 40, false, 0, "applied to all limbs"), new Effect("muscleHealth", -ml * 0.01 * 10, false, 0, "applied to all limbs")]) }, 0, "Bio-chem fluid", 2)],
         ["bleach", new SyringeLiquid("#ffffff", function(ml){  }, 0, "Bleach", 5)],
         ["blood", new SyringeLiquid("#ffc900", function(ml){ body.addEffects([new Effect("bloodVolume", 30 * ml / 750)]) }, 0, "Blood", 0)],
         ["braingrow", new SyringeLiquid("#c0535e", function(ml){  }, 0, "Braingrow", 0)],
         ["carbonatedwater", new SyringeLiquid("#66a6ff", function(ml){  }, 0, "Carbonated water", 0)],
         ["ceftriaxone", new SyringeLiquid("#46cf30", function(ml){ body.addEffects([new Effect("antibioticImmunityTime", 1125 * ml * 0.01)]) }, 0, "Ceftriaxone", 0)],
         ["cereal", new SyringeLiquid("#ffdb9c", function(ml){  }, 0, "Cereal mix", 0.9)],
-        ["chloroform", new SyringeLiquid("#bad1a7", function(ml){body.addEffect(new Effect("consciousness", 0, true, 180 * 0.01 * ml)); body.effects["consciousness"].desc = `consciousness -> 0 [-8/s]`}, 0, "Chloroform", 0)],
+        ["chloroform", new SyringeLiquid("#bad1a7", function(ml){body.addEffect(new Effect("consciousness", 0, true, 180 * 0.01 * ml, `consciousness -> 0 [-8/s]`))}, 0, "Chloroform", 0)],
         ["chocolatemilk", new SyringeLiquid("#8f5c37", function(ml){  }, 0, "Chocolate milk", 1)],
+        ["radwater", new SyringeLiquid("#79e0dd", function(ml){  }, 0, "Clean water", 0.2)],
         ["coffee", new SyringeLiquid("#50321e", function(ml){  }, 0, "Coffee", 0.7)],
         ["dirtywater", new SyringeLiquid("#997e43", function(ml){  }, 0, "Dirty water", 2)],
-        ["disinfectant", new SyringeLiquid("#c8ffff", function(ml){  }, 0, "Antiseptic", 1.25)],
         ["energydrink", new SyringeLiquid("#bb00ff", function(ml){  }, 0, "Energy drink", 0.7)],
-        ["epinephrine", new SyringeLiquid("#a1ffe9", function(ml){}, 0, "Epinephrine", 0)],
+        ["epinephrine", new SyringeLiquid("#a1ffe9", function(ml){body.addEffects([new Effect("adrenaline", 100, false, 0, "", false), new Effect("epinephrine", 0, true, ml / 20 * 120)]); if(body.effects["epinephrine"] && body.effects["epinephrine"].duration > 240){body.addEffect(new Effect("TryStartFibrillation", 1, false, 0, "Forced fibrillation", false))}}, 0, "Epinephrine", 0)], 
         ["fat", new SyringeLiquid("#d1be3f", function(ml){  }, 0, "Fat", 2)],
         ["fentanyl", new SyringeLiquid("#57f2ff", function(ml){ body.addEffects([new Effect("GetOrAddComponent<Painkillers>().opiateAmount", ml * 0.1 * 420)]) }, 0, "Fentanyl", 0)],
         ["groundwater", new SyringeLiquid("#598ad4", function(ml){  }, 0, "Groundwater", 0.15)],
+        ["midgradestimulant", new SyringeLiquid("#d1d1d1", function(ml){body.addEffect(new Effect("midgradestimulant", 0, true, ml * 2))}, 0, "Hard stimulant", 0)],
         ["heroin", new SyringeLiquid("#ebebeb", function(ml){ body.addEffects([new Effect("GetOrAddComponent<Painkillers>().opiateAmount", ml * 0.01 * 130), new Effect("sicknessAmount", ml * 0.01 * 50)]) }, 0, "Heroin", 0)],
-        ["highgradestimulant", new SyringeLiquid("#ffffff", function(ml){body.addEffect(new Effect("highgradestimulant", 0, true, ml * 2))}, 0, "Medical-grade stimulant", 0)],
         ["hotsauce", new SyringeLiquid("#ff0000", function(ml){  }, 0, "Hot sauce", 1)],
         ["icecream", new SyringeLiquid("#edffbd", function(ml){  }, 0, "Ice cream", 1)],
         ["icetea", new SyringeLiquid("#fa8734", function(ml){  }, 0, "Iced tea bottle", 0.4)],
         ["keratinbooster", new SyringeLiquid("#ffd154", function(ml){if(body.effects["clawRegrowTime"] && body.effects["clawRegrowTime"].value > 3600) {body.addEffects([new Effect("sicknessAmount", ml * 0.02 * 10), new Effect("clawRegrowTime", 1400 * ml * 0.02 * 0.1)])} else {body.addEffect(new Effect("clawRegrowTime", 1400 * ml * 0.02))}}, 0, "Keratin-booster", 0)],
         ["ketchup", new SyringeLiquid("#ff2b2b", function(ml){  }, 0, "Ketchup", 0)],
         ["lemonade", new SyringeLiquid("#fff761", function(ml){  }, 0, "Lemonade", 0.4)],
-        ["lowgradestimulant", new SyringeLiquid("#909090", function(ml){body.addEffect(new Effect("lowgradestimulant", 0, true, ml * 2))}, 0, "Off-brand stimulant", 0)],
+        ["urine", new SyringeLiquid("#ffda54", function(ml){  }, 0, "Lemonade", 2)],
         ["lrdserum", new SyringeLiquid("#d4cb87", function(ml){  }, 0, "L.R.D. Serum", 0)],
         ["lumalgae", new SyringeLiquid("#219900", function(ml){  }, 0, "Lumalgae", 1.6)],
+        ["highgradestimulant", new SyringeLiquid("#ffffff", function(ml){body.addEffect(new Effect("highgradestimulant", 0, true, ml * 2))}, 0, "Medical-grade stimulant", 0)],
         ["mercury", new SyringeLiquid("#4d4d4d", function(ml){  }, 0, "Mercury", 10)],
-        ["midgradestimulant", new SyringeLiquid("#d1d1d1", function(ml){body.addEffect(new Effect("midgradestimulant", 0, true, ml * 2))}, 0, "Hard stimulant", 0)],
         ["milk", new SyringeLiquid("#ffffff", function(ml){  }, 0, "Milk", 0.4)],
         ["mindwipe", new SyringeLiquid("#21485e", function(ml){  }, 0, "Mindwipe", 0)],
         ["mold", new SyringeLiquid("#3f4f32", function(ml){  }, 0, "Mold", 3)],
         ["morphine", new SyringeLiquid("#967b5f", function(ml){ body.addEffects([new Effect("GetOrAddComponent<Painkillers>().opiateAmount", ml * 0.01 * 90)]) }, 0, "Morphine", 0)],
+        ["naloxone", new SyringeLiquid("#e8d8be", function(ml){if(body.effects["GetOrAddComponent<Painkillers>().opiateAmount"]){body.addEffect(new Effect("antagonistAmount", ml * 50 * 0.01))}}, 0, "Naloxone", 0)],
         ["naltrexone", new SyringeLiquid("#ffffff", function(ml){  }, 0, "Naltrexone", 0)],
+        ["lowgradestimulant", new SyringeLiquid("#909090", function(ml){body.addEffect(new Effect("lowgradestimulant", 0, true, ml * 2))}, 0, "Off-brand stimulant", 0)],
         ["oil", new SyringeLiquid("#473215", function(ml){  }, 0, "Oil", 5)],
         ["oliveoil", new SyringeLiquid("#818707", function(ml){  }, 0, "Olive oil", 1)],
         ["opium", new SyringeLiquid("#ffeb51", function(ml){ body.addEffects([new Effect("GetOrAddComponent<Painkillers>().opiateAmount", ml * 0.01 * 40)]) }, 0, "Opium", 0)],
         ["orangejuice", new SyringeLiquid("#ff8929", function(ml){  }, 0, "Orange juice", 0.4)],
-        ["oxyline", new SyringeLiquid("#4dffde", function(ml){}, 0, "Oxyline", 0)],
+        ["oxyline", new SyringeLiquid("#4dffde", function(ml){body.addEffect(new Effect("oxyline", 0, true, 60 * ml / 30))}, 0, "Oxyline", 0)],
         ["painkillers", new SyringeLiquid("#ffffff", function(ml){  }, 0, "Painkillers", 0)],
         ["powderedmilk", new SyringeLiquid("#f2f2f2", function(ml){  }, 0, "Powdered milk", 1)],
+        ["procoagulant", new SyringeLiquid("#bd5660", function(ml){body.addEffects([new Effect("internalBleeding", 0, true, 12 * ml / 33.34), new Effect("bloodViscosity", 1.75, true, 12 * ml / 33.34), new Effect("strokeAmount", -10, true, 12 * ml / 33.34), new Effect("bleedAmount", 0, true, 12 * ml / 33.34)]); body.effects["internalBleeding"].desc = "*= 0.95"; body.effects["bleedAmount"].desc = "*= 0.96"}, 0, "Procoagulant", 0)],
         ["producejuice", new SyringeLiquid("#fffeb5", function(ml){  }, 0, "Produce juice", 0.9)],
-        ["radwater", new SyringeLiquid("#79e0dd", function(ml){  }, 0, "Clean water", 0.2)],
         ["redblood", new SyringeLiquid("#c70a0a", function(ml){ body.addEffects([new Effect("bloodVolume", 30 * ml / 750), new Effect("sicknessAmount", 50 * ml / 750), new Effect("septicShock", 40 * ml / 750)]) }, 0, "Red blood", 0)],
         ["refinedjuice", new SyringeLiquid("#ffe173", function(ml){  }, 0, "Refined juice", 0.7)],
         ["reliefcream", new SyringeLiquid("#bd5bc9", function(ml){}, 0, "Relief cream", 0.75)],
         ["ringersolution", new SyringeLiquid("#ededed", function(ml){ body.addEffects([new Effect("bloodVolume", 35 * ml / 700), new Effect("bloodViscosity", -40 * ml / 700), new Effect("thirst", 60 * ml / 700)]) }, 0, "Ringer's solution", 0)],
         ["saline", new SyringeLiquid("#c4c4c4", function(ml){ body.addEffects([new Effect("bloodVolume", 40 * ml / 750), new Effect("bloodViscosity", -50 * ml / 750), new Effect("thirst", 70 * ml / 750)]) }, 0, "Saline", 0)],
-        ["sap", new SyringeLiquid("#f7bd34", function(ml){  }, 0, "Tree sap", 2)],
         ["sleepingpills", new SyringeLiquid("#8ca893", function(ml){  }, 0, "Sleeping pills", 0)],
         ["soap", new SyringeLiquid("#a1ffba", function(ml){ }, 0, "Soap", 1.6)],
         ["soda", new SyringeLiquid("#705e49", function(ml){  }, 0, "Soda", 0.6)],
@@ -156,26 +189,67 @@
         ["soup", new SyringeLiquid("#7d5100", function(ml){  }, 0, "Soup", 0.6)],
         ["sportsdrink", new SyringeLiquid("#0a3bff", function(ml){  }, 0, "Sports drink", 0.4)],
         ["streptokinase", new SyringeLiquid("#427e82", function(ml){ body.addEffects([new Effect("bloodViscosity", -50 * ml / 33.334), new Effect("sicknessAmount", 5 * ml / 33.334)]) }, 0, "Streptokinase", 0)],
-        ["procoagulant", new SyringeLiquid("#bd5660", function(ml){body.addEffects([new Effect("internalBleeding", 0, true, 12 * ml / 33.34), new Effect("bloodViscosity", 1.75, true, 12 * ml / 33.34), new Effect("strokeAmount", -10, true, 12 * ml / 33.34), new Effect("bleedAmount", 0, true, 12 * ml / 33.34)]); body.effects["internalBleeding"].desc = "*= 0.95"; body.effects["bleedAmount"].desc = "*= 0.96"}, 0, "Procoagulant", 0)],
-        ["urine", new SyringeLiquid("#ffda54", function(ml){  }, 0, "Lemonade", 2)],
+        ["sap", new SyringeLiquid("#f7bd34", function(ml){  }, 0, "Tree sap", 2)],
         ["vasopressin", new SyringeLiquid("#ffffff", function(ml){ body.addEffects([new Effect("bloodPressureChangeFromMedicine", -ml / 20 * 120)]) }, 0, "Vasopressin", 0)],
         ["water", new SyringeLiquid("#75d1ff", function(ml){  }, 0, "Water", 0)],
         ["woundglue", new SyringeLiquid("#c9c9c9", function(ml){ }, 0, "Wound glue", 0.75)],
         ["yogurt", new SyringeLiquid("#d5ebf0", function(ml){  }, 0, "Yogurt", 1)]
     ]);
 
+    const effectLinks = new Map([
+        ["bloodVolume", {locName: "Blood volume", link: "/Blood_(mechanic)#Blood_volume"}],
+        ["septicShock", {locName: "Septic shock", link: "/Sepsis"}],
+        ["sicknessAmount", {locName: "Sickness", link: "/Sickness"}],
+        ["muscleHealth", {locName: "Muscle health", link: "/Limb_health#Muscle_health"}],
+        ["antibioticImmunityTime", {locName: "Antibiotic effect", link: "/Antibiotics_(liquid)"}],
+        ["venomTotal", {locName: "Venom", link: "/Venom"}],
+        ["SetDisinfect", {locName: "Disinfection", link: "/Infection#Lowering_infection"}],
+        ["consciousness", {locName: "Consciousness", link: "/Consciousness"}],
+        ["pain", {locName: "Pain", link: "/Pain"}],
+        ["adrenaline", {locName: "Adrenaline", link: "/Pain#Adrenaline"}],
+        ["epinephrine", {locName: "Epinephrine's timed operation", link: "/Epinephrine_(liquid)"}],
+        ["TryStartFibrillation", {locName: "Fibrillation", link: "/Heart#Fibrillation"}],
+        ["GetOrAddComponent<Painkillers>().opiateAmount", {locName: "Opiate amount", link: "/Opiates"}],
+        ["clawRegrowTime", {locName: "Claw regrow time", link: "/Bare_hands#Claw_health"}],
+        ["highgradestimulant", {locName: "Medical-grade stimulants' timed operation", link: "/Stimulants"}],
+        ["midgradestimulant",{ locName: "Hard stimulants' timed operation", link: "/Stimulants"}],
+        ["lowgradestimulant", {locName: "Off-brand stimulants' timed operation", link: "/Stimulants"}],
+        ["antagonistAmount", {locName: "Opiate antagonist amount", link: "/Opiates#Antagonists"}],
+        ["oxyline", {locName: "Oxyline's timed operation", link: "/Oxyline_(liquid)"}],
+        ["internalBleeding", {locName: "Internal bleeding", link: "/Internal_bleeding"}],
+        ["bloodViscosity", {locName: "Blood viscosity", link: "/Blood_(mechanic)#Blood_viscosity"}],
+        ["strokeAmount",{locName: "Stroke", link:  "/Stroke"}],
+        ["bleedAmount", {locName: "Bleeding", link: "/Blood_(mechanic)#Bleeding"}],
+        ["thirst", {locName: "Hydration", link: "/Thirst"}],
+        ["bloodPressureChangeFromMedicine",{locName: "Blood pressure change", link: "/Blood_(mechanic)#Blood_pressure"}]
+    ]);
+
     class Effect {
-        constructor(name, value, timed = false, duration = 0) {
+        /**
+         * Class used to store effect data
+         * 
+         * @param {string} name                - Name of the effect as it's used in the game
+         * @param {number} value               - Numeric value of the effect strength
+         * @param {boolean} timed              - Whether an effect is a TimedOp or not
+         * @param {number} duration            - Duration of the effect (if it is timed)
+         * @param {boolean} changeWithIncrease - Whether a value of the effect should change with time
+         * 
+         */
+        constructor(name, value, timed = false, duration = 0, desc="", changeWithIncrease = true) {
             this.name = name;
             this.value = value;
             this.timed = timed;
             this.duration = duration;
-            this.desc = ""; // for the doTimedOp and if() conditions.
+            this.desc = desc; // for the doTimedOp and if() conditions.
+            this.changeWithIncrease = changeWithIncrease;
         }
     }
 
 
     class Body {
+        /**
+         * Body class storing all the applied effects
+         */
         constructor(){
             this.effects = {};
         }
@@ -183,9 +257,10 @@
         addEffect(effect, timed=false) {
             if(this.effects[effect.name]) {
                 if(timed) {
-                    this.effects[effect.name].duration += effect.duration; // doTimedOp's duration. Example - stimulants
+                    this.effects[effect.name].duration += effect.duration;
                 } else {
-                    this.effects[effect.name].value += effect.value; // general value. Example - biochem
+                    if(this.effects[effect.name].changeWithIncrease)
+                        this.effects[effect.name].value += effect.value;
                 }
             } else {
                 this.effects[effect.name] = effect;
@@ -203,6 +278,14 @@
 
 
     class Rect {
+        /**
+         * Bounding box used for collidable objects like the shrapnel piece and the syringe
+         * 
+         * @param {number} x 
+         * @param {number} y 
+         * @param {number} width 
+         * @param {number} height 
+         */
 		constructor(x, y, width, height) {
             this.x = x;
             this.y = y;
@@ -222,6 +305,12 @@
 
 
     class SyringeContainer {
+        /**
+         * Storage for the syringe, contains liquids data
+         * 
+         * @param {Array<SyringeLiquid>} liquids - Stored liquids
+         * @param {number} volume                - Volume of the syringe (100/150/750)
+         */
         constructor(liquids=[], volume=0) {
             this.volume = volume;
             this.liquids = liquids;
@@ -366,10 +455,12 @@
         }
 
         Update(delta) {
-            if(this.isNeedleSnapped)
+            if(this.isNeedleSnapped) {
                 return;
+            }
+                
             if(this.attachedMouse.justClicked) { // Todo: check for attachedHand instead of attachedMouse
-                if(!this.holdingSyringe && inRange(this.attachedMouse.x, this.syringe.rect.x - this.syringe.rect.width / 2, this.syringe.rect.x + this.syringe.rect.width / 2) && inRange(this.attachedMouse.y, this.syringe.rect.y, this.syringe.rect.y + this.syringe.rect.height)) {
+                if(!this.holdingSyringe && inRange(this.attachedHand.handPos.x, this.syringe.rect.x - this.syringe.rect.width / 2, this.syringe.rect.x + this.syringe.rect.width / 2) && inRange(this.attachedHand.handPos.y, this.syringe.rect.y, this.syringe.rect.y + this.syringe.rect.height)) {
                     this.holdingSyringe = true;
                     heldOffset = this.syringe.rect.calcOffset(this.attachedHand);
                 }
@@ -389,6 +480,9 @@
                     if(Math.abs(syringeXOffset) > 80) {
                         bulletHit.play();
                         this.isNeedleSnapped = true;
+                        syringeLoop.volume.value = -Infinity;
+                        // band-aid solution
+                        writeStats();
                         return;
                     } if(!this.wasInjectingBefore) {
                         this.wasInjectingBefore = true;
@@ -399,6 +493,9 @@
 
                         syringeLoop.volume.value = - 12 + clamp01(injectionSpeed) * 12;
                         this.syringe.storage.Inject(injectionSpeed * delta * 100);
+
+                        // band-aid solution
+                        writeStats();
                     } else {
                         syringeLoop.volume.value = -Infinity;
                     }
@@ -579,6 +676,8 @@
 
         // liquid help page
         let liquidCardInfoLink = document.createElement("a");
+        liquidCardInfoLink.style.fontSize = "0.75rem";
+        liquidCardInfoLink.style.marginLeft = "-2em";
         liquidCardInfoLink.href = `/${liquids.get(name).name} (liquid)`;
         liquidCardInfoLink.innerHTML = "[?]";
         liquidCardInfoLink.style.paddingLeft = "-1em";
@@ -606,7 +705,7 @@
         btn.setAttribute("data-cu-action", "pop-liquid");
         btn.id = name;
 
-        liquidCard.append(liquidCardColorTooltip, liquidCardNameLabel, liquidCardInfoLink, liquidCardInput, label, btn);
+        liquidCard.append(liquidCardColorTooltip, liquidCardNameLabel,liquidCardInfoLink, liquidCardInput, label, btn);
         document.getElementsByClassName("liquid-control-cards")[0].append(liquidCard);
     }
 
@@ -621,6 +720,14 @@
         const label = slider.closest(".cu-canvas-panel").querySelector('#ll-slider');
         label.textContent = e.target.value + "mL";
         liquidsToAddAmounts[liquidsToAdd.indexOf(slider.closest(".cu-canvas-panel").querySelector(".ll-btn").id)] = parseFloat(e.target.value);
+    }
+    
+    function createEffectTooltip(effect) {
+        let effectLink = document.createElement("a");
+        effectLink.style.margin = "0.5em 0.25em";
+        effectLink.href = effectLinks.get(effect.name).link;
+        effectLink.innerHTML = effectLinks.get(effect.name).locName;
+        return effectLink;
     }
     
     function createLiquidControlList() {
@@ -697,7 +804,15 @@
                 hiddenStatsEl.innerHTML = "<dl><div>";
                 for(let key in body.effects) {
                     if(body.effects.hasOwnProperty(key)) {
-                        hiddenStatsEl.innerHTML += `<dt>${body.effects[key].name}: ${body.effects[key].value != 0 ? "Amount: " + body.effects[key].value.toFixed(4) + "; " : ""} ${body.effects[key].timed ? "Duration: " + body.effects[key].duration.toFixed(4) + "; " : ""} ${body.effects[key].desc ? "Additional info: " + body.effects[key].desc : ""}</dt>`;
+                        let effect = document.createElement("div");
+                        effect.style.display = "flex";
+                        effect.style.flexDirection = "row";
+                        let effectText = document.createElement("p");
+                        effectText.textContent = `: ${body.effects[key].value != 0 ? "Amount: " + body.effects[key].value.toFixed(4) + "; " : ""} ${body.effects[key].timed ? "Duration: " + body.effects[key].duration.toFixed(4) + "; " : ""} ${body.effects[key].desc ? "Additional info: " + body.effects[key].desc : ""}`;
+                        
+                        effect.append(createEffectTooltip(body.effects[key]));
+                        effect.append(effectText);
+                        hiddenStatsEl.append(effect);
                     }
                 }
                 hiddenStatsEl.innerHTML += "</div></dl>";
@@ -739,9 +854,11 @@
 				case "restart":
 					minigame.initState(new SyringeComposer([], minigame.syringe.storage.volume));
                     minigame.syringe.recalculateColor();
+                    writeStats();
 					break;
                 case "show-hidden":
                     showHidden = !showHidden;
+                    writeStats();
                     break;
                 case "add-liquids":
                     liquidControlIsEnabled = !liquidControlIsEnabled;
@@ -752,18 +869,21 @@
                     createLiquidControlList();
                     minigame.initState(new SyringeComposer([], 100));
                     minigame.syringe.recalculateColor();
+                    writeStats();
                     break;
                 case "150":
                     liquidControlIsEnabled = false;
                     createLiquidControlList();
                     minigame.initState(new SyringeComposer([], 150));
                     minigame.syringe.recalculateColor();
+                    writeStats();
                     break;
                 case "750":
                     liquidControlIsEnabled = false;
                     createLiquidControlList();
                     minigame.initState(new SyringeComposer([], 750));
                     minigame.syringe.recalculateColor();
+                    writeStats();
                     break;
                 case "spawn-liquid-html":
                     if(!liquidControlIsEnabled)
@@ -856,7 +976,7 @@
 			drawAll(ctx, canvas);
             if(mouse.justClicked)
                 mouse.justClicked = false;
-			writeStats();
+			// writeStats();
 		
 			loopId = requestAnimationFrame(frame);
 		}
