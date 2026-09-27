@@ -1,4 +1,7 @@
 (async function () {
+
+    
+
     const RETRO_FONT_URL = "https://static.wikitide.net/casualtiesunknownwiki/a/a7/Retro_Gaming.woff2";
 
     const eyeURL = "https://static.wikitide.net/casualtiesunknownwiki/1/1f/Minigameeye.png";

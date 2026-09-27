@@ -1,4 +1,18 @@
 (async function () {
+    /**
+     * 
+     * Dislocation minigame copy for Casualties:Unknown Wiki. Original game by Orsoniks
+     * 
+     * Author of the copy: L30p4rd3n
+     * 
+     * Source code also available here: 
+     * https://github.com/L30p4rd3n/CU-minigames-replicas
+     * 
+     * Casualties:Unknown Wiki is available here:
+     * https://casualtiesunknown.miraheze.org
+     * 
+     */
+
     // NOTE: The natural decrease of dislocationTimer is omitted here to allow for actual minigame progress 
     // (and also the percentage does not drop when in minigame)
     debugger;
@@ -121,17 +135,21 @@
                 return;
             }
             let rect = this.bone.getRect();
-            if(!inRange(this.attachedMouse.x, this.bone.x, this.bone.x + this.bone.width) || !inRange(this.attachedMouse.y, this.bone.y - this.bone.height / 2, this.bone.y + this.bone.height / 2))
+
+            if(!inRange(this.attachedHand.handPos.x, this.bone.x, this.bone.x + this.bone.width) || !inRange(this.attachedHand.handPos.y, this.bone.y - this.bone.height / 2, this.bone.y + this.bone.height / 2))
+                return;
+            /* if(!inRange(this.attachedMouse.x, this.bone.x, this.bone.x + this.bone.width) || !inRange(this.attachedMouse.y, this.bone.y - this.bone.height / 2, this.bone.y + this.bone.height / 2))
                     return;
+            */
 
             if(this.hasWrench) {
-                this.boneVelocity.x += this.attachedHand.handVelocity.x * 24 / 1.5;
-                this.boneVelocity.y += this.attachedHand.handVelocity.y * 24 / 1.5;
+                this.boneVelocity.x += this.attachedHand.handVelocity.x * 24;
+                this.boneVelocity.y += this.attachedHand.handVelocity.y * 24;
 
                 this.trackPain += randrange(4, 10);
             } else {
-                this.boneVelocity.x += this.attachedHand.handVelocity.x * (Math.random() * 0.6 + 0.7) * 20 / 1.5;
-                this.boneVelocity.y += this.attachedHand.handVelocity.y * (Math.random() * 0.6 + 0.7) * 20 / 1.5;
+                this.boneVelocity.x += this.attachedHand.handVelocity.x * (Math.random() * 0.6 + 0.7) * 20;
+                this.boneVelocity.y += this.attachedHand.handVelocity.y * (Math.random() * 0.6 + 0.7) * 20;
                 this.trackPain += randrange(15, 24);
                 if(Math.random() > 0.995) {
                     audios[`boneBreak${randrange(1, 4)}`].play();
