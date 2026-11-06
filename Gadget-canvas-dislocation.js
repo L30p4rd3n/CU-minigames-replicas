@@ -238,7 +238,7 @@
 		    ctx.textAlign = "center";
             ctx.fillText(minigame.remainingText, canvas.width / 2, canvas.height - 64);   
         }
-        hand.drawHandUpper(ctx, mouse.clicked ? handClickImage : handIdleImage);
+        hand.drawHandUpper(ctx, mouse.clicked ? handClickImage : handIdleImage, 0, minigame.trackPain);
     }
     
     function writeStats() {

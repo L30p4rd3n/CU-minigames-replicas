@@ -1,6 +1,17 @@
 (async function () {
-
-    
+    /**
+     * 
+     * Self-harm cut minigame copy for Casualties:Unknown Wiki. Original game by Orsoniks
+     * 
+     * Author of the copy: L30p4rd3n
+     * 
+     * Source code also available here: 
+     * https://github.com/L30p4rd3n/CU-minigames-replicas
+     * 
+     * Casualties:Unknown Wiki is available here:
+     * https://casualtiesunknown.miraheze.org
+     * 
+     */    
 
     const RETRO_FONT_URL = "https://static.wikitide.net/casualtiesunknownwiki/a/a7/Retro_Gaming.woff2";
 

@@ -42,11 +42,19 @@
     let clamp = window.CUCanvasBase.clamp;
     let vectorFromAngle = window.CUCanvasBase.vectorFromAngle;
     let normalised = window.CUCanvasBase.normalised;
-    let conditionToGradient = window.CUCanvasBase.conditionToGradient
+    let evaluateGradient = window.CUCanvasBase.evaluateGradient;
     function vectorToAngle(dir) { // override
         let num = Math.atan2(-dir.x, dir.y) * 57.29578;
         return num;
     }
+
+    const stops = [
+            {pos: 0, color: [0x78, 0x78, 0x78]},    // #787878
+            {pos: 1, color: [0x93, 0x00, 0x00]},    // #930000
+            {pos: 12.9, color:[0xbf, 0x15, 0x01]},  // #BF1501
+            {pos: 47.9, color: [0xf1, 0xde, 0x1f]}, // #F1DE1F 
+            {pos: 100, color: [0x83, 0xff, 0x6b]},  // #83FF6B
+        ];
 
     // hand
     let handClass = window.CUCanvasBase.Hand;
@@ -235,7 +243,7 @@
         ctx.fillText("(", x, 114);
         x += ctx.measureText("(").width;
 
-        ctx.fillStyle = conditionToGradient(minigame.attachedBatteryCharge / minigame.attachedBatteryMaxCharge * 100);
+        ctx.fillStyle = evaluateGradient(minigame.attachedBatteryCharge / minigame.attachedBatteryMaxCharge * 100, stops, "#787878");
         ctx.fillText((charge < 1 && charge > 0.01 ? "<1" : charge.toFixed(0)) + "%", x, 114);
         x += ctx.measureText((charge < 1 && charge > 0.01 ? "<1" : charge.toFixed(0)) + "%").width;
 
